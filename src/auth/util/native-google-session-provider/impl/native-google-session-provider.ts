@@ -39,32 +39,36 @@ export class NativeGoogleSessionProvider implements SessionProvider {
     }
 
     private callGoogleNativeLogin(idToken: string, emailId: string): Observable<OAuthSession> {
-        const platform = window.device.platform.toLowerCase() ==='ios' ? 'ios' :null;
-        const apiRequest: Request = new Request.Builder()
-            .withType(HttpRequestType.POST)
-            .withPath(NativeGoogleSessionProvider.LOGIN_API_ENDPOINT)
-            .withBearerToken(false)
-            .withUserToken(false)
-            .withBody({
-                emailId: emailId,
-                platform: platform
-            })
-            .withHeaders({
-                'X-GOOGLE-ID-TOKEN': idToken
-            })
-            .build();
-        return this.apiService.fetch<{ access_token: string, refresh_token: string }>(apiRequest)
-            .pipe(
-                map((success) => {
-                    if (success.body) {
-                        CsModule.instance.updateAuthTokenConfig(success.body.access_token);
-                    }
-                    return {
-                        access_token: success.body.access_token,
-                        refresh_token: success.body.refresh_token,
-                        userToken: NativeGoogleSessionProvider.parseAccessToken(success.body.access_token).userToken
-                    };
+        let devicePlatform = "";
+        return window['Capacitor']['Plugins'].Device.getInfo().then((val) => {
+            devicePlatform = val.platform
+            const platform = devicePlatform.toLowerCase() ==='ios' ? 'ios' :null;
+            const apiRequest: Request = new Request.Builder()
+                .withType(HttpRequestType.POST)
+                .withPath(NativeGoogleSessionProvider.LOGIN_API_ENDPOINT)
+                .withBearerToken(false)
+                .withUserToken(false)
+                .withBody({
+                    emailId: emailId,
+                    platform: platform
                 })
-            );
+                .withHeaders({
+                    'X-GOOGLE-ID-TOKEN': idToken
+                })
+                .build();
+            return this.apiService.fetch<{ access_token: string, refresh_token: string }>(apiRequest)
+                .pipe(
+                    map((success) => {
+                        if (success.body) {
+                            CsModule.instance.updateAuthTokenConfig(success.body.access_token);
+                        }
+                        return {
+                            access_token: success.body.access_token,
+                            refresh_token: success.body.refresh_token,
+                            userToken: NativeGoogleSessionProvider.parseAccessToken(success.body.access_token).userToken
+                        };
+                    })
+                );
+        })
     }
 }

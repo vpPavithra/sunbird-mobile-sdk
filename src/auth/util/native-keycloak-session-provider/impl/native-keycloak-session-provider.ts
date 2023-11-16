@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { SunbirdSdk } from '../../../../sdk';
 import { CsModule } from '@project-sunbird/client-services';
 import { WebviewSessionProviderConfig } from '../../webview-session-provider/def/webview-session-provider-config';
+import { OAuthSession } from 'src/auth/def/o-auth-session';
 
 export interface NativeKeycloakTokens {
     username: string;
@@ -15,7 +16,7 @@ export class NativeKeycloakSessionProvider implements SessionProvider {
     private static readonly LOGIN_API_ENDPOINT = '/keycloak/login';
     private apiService: ApiService;
     protected apiConfig: ApiConfig;
-    
+    devicePlatform = "";
     private static parseAccessToken(accessToken: string): {
         userToken: string;
         accessTokenExpiresOn: number;
@@ -27,45 +28,55 @@ export class NativeKeycloakSessionProvider implements SessionProvider {
         };
     }
     
+    private loginConfig: WebviewSessionProviderConfig;
     constructor(
-        private loginConfig: WebviewSessionProviderConfig,
-        private nativeKeycloakTokenProvider: NativeKeycloakTokens
+        private nativeKeycloakTokenProvider: () => Promise<{WebviewSessionProviderConfig, NativeKeycloakTokens}>
     ) {
+        window['Capacitor']['Plugins'].Device.getInfo().then((val) => {
+            this.devicePlatform = val.platform;
+        })
         this.apiService = SunbirdSdk.instance.apiService;
     }
 
-    async provide(): Promise<any> {
-        return this.callKeycloakNativeLogin(this.nativeKeycloakTokenProvider.username, this.nativeKeycloakTokenProvider.password).toPromise();
+    async provide(): Promise<OAuthSession> {
+        const nativeKeycloakTokenProvider = await this.nativeKeycloakTokenProvider();
+        console.log("token ****** ", nativeKeycloakTokenProvider);
+        let token = nativeKeycloakTokenProvider.NativeKeycloakTokens
+        this.loginConfig = nativeKeycloakTokenProvider.WebviewSessionProviderConfig
+        return this.callKeycloakNativeLogin(token.username, token.password).toPromise();
     }
 
-    private callKeycloakNativeLogin(emailId: string, password: string): Observable<any> {
-        const platform = window.device.platform.toLowerCase() ==='ios' ? 'ios' : window.device.platform.toLowerCase();
+    private callKeycloakNativeLogin(emailId: string, password: string): Observable<OAuthSession | any> {
+        console.log('username, password ', emailId, password);
+        const platform = this.devicePlatform.toLowerCase() ==='ios' ? 'ios' : this.devicePlatform.toLowerCase();
         const apiRequest: Request = new Request.Builder()
             .withType(HttpRequestType.POST)
             .withPath(NativeKeycloakSessionProvider.LOGIN_API_ENDPOINT)
             .withBearerToken(false)
             .withUserToken(false)
             .withBody({
-                client_id: platform,
+                client_id: platform || 'android',
                 emailId: emailId,
                 password: password,
                 loginConfig: this.loginConfig.target
             })
             .build();
+            console.log('keycloack req ', apiRequest);
         return this.apiService.fetch<{ access_token: string, refresh_token: string }>(apiRequest)
-            .pipe(
-                map((success) => {
-                    if (success.body && success.body.access_token) {
-                        CsModule.instance.updateAuthTokenConfig(success.body.access_token);
-                        return {
-                            access_token: success.body.access_token,
-                            refresh_token: success.body.refresh_token,
-                            userToken: NativeKeycloakSessionProvider.parseAccessToken(success.body.access_token).userToken
-                        };
-                    } else {
-                        return success.body;
-                    }
-                })
-            );
+        .pipe(
+            map((success) => {
+                console.log('login success ', success);
+                if (success.body && success.body.access_token) {
+                    CsModule.instance.updateAuthTokenConfig(success.body.access_token);
+                    return {
+                        access_token: success.body.access_token,
+                        refresh_token: success.body.refresh_token,
+                        userToken: NativeKeycloakSessionProvider.parseAccessToken(success.body.access_token).userToken
+                    };
+                } else {
+                    return success.body;
+                }
+            })
+        );
     }
 }

@@ -52,7 +52,8 @@ export class DebuggingServiceImpl implements DebuggingService {
             this.profileService.getActiveProfileSession().toPromise().then(async (profile) => {
                 if (profile && profile.uid) {
                     this._userId = profile.uid;
-                    const _jwt = JWTUtil.createJWToken(this._deviceId, this.userId, JWTokenType.HS256);
+                    console.log("device id ", this._deviceId);
+                    const _jwt = JWTUtil.createJWToken("xyz", this.userId, JWTokenType.HS256);
                     if (traceID) {
                         await this.sharedPreferences.putString(CsClientStorage.TRACE_ID, traceID).toPromise();
                     } else {
