@@ -40,14 +40,12 @@ export class NativeKeycloakSessionProvider implements SessionProvider {
 
     async provide(): Promise<OAuthSession> {
         const nativeKeycloakTokenProvider = await this.nativeKeycloakTokenProvider();
-        console.log("token ****** ", nativeKeycloakTokenProvider);
         let token = nativeKeycloakTokenProvider.NativeKeycloakTokens
         this.loginConfig = nativeKeycloakTokenProvider.WebviewSessionProviderConfig
         return this.callKeycloakNativeLogin(token.username, token.password).toPromise();
     }
 
     private callKeycloakNativeLogin(emailId: string, password: string): Observable<OAuthSession | any> {
-        console.log('username, password ', emailId, password);
         const platform = this.devicePlatform.toLowerCase() ==='ios' ? 'ios' : this.devicePlatform.toLowerCase();
         const apiRequest: Request = new Request.Builder()
             .withType(HttpRequestType.POST)
@@ -61,11 +59,9 @@ export class NativeKeycloakSessionProvider implements SessionProvider {
                 loginConfig: this.loginConfig.target
             })
             .build();
-            console.log('keycloack req ', apiRequest);
         return this.apiService.fetch<{ access_token: string, refresh_token: string }>(apiRequest)
         .pipe(
             map((success) => {
-                console.log('login success ', success);
                 if (success.body && success.body.access_token) {
                     CsModule.instance.updateAuthTokenConfig(success.body.access_token);
                     return {
