@@ -130,7 +130,7 @@ describe('CourseCertificateManagerImpl', () => {
         describe('when fetch successful', () => {
             it('should cache svg to keyValueStore', async (done) => {
                 // arrange
-                spyOn(mockKeyValueStore, 'setValue').and.callThrough();
+                jest.spyOn(mockKeyValueStore, 'setValue').mockImplementation();
 
                 // act
                 await courseCertificateManager.getCertificate(request).toPromise();
@@ -150,9 +150,9 @@ describe('CourseCertificateManagerImpl', () => {
             it('should attempt to fetch from cache', async (done) => {
                 // arrange
                 await mockKeyValueStore.setValue(`certificate_${request.certificate.identifier}_${request.courseId}_${'SOME_UID'}`, '').toPromise();
-                spyOn(mockKeyValueStore, 'setValue').and.callThrough();
-                spyOn(mockKeyValueStore, 'getValue').and.callThrough();
-                spyOn(mockCsCourseService, 'getSignedCourseCertificate').and.returnValue(throwError(new Error('UNKNOWN_ERROR')));
+                jest.spyOn(mockKeyValueStore, 'setValue').mockImplementation();
+                jest.spyOn(mockKeyValueStore, 'getValue').mockImplementation();
+                jest.spyOn(mockCsCourseService, 'getSignedCourseCertificate').mockReturnValue(throwError(new Error('UNKNOWN_ERROR')));
 
                 // act
                 try {

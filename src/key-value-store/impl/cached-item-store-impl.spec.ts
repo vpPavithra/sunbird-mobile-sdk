@@ -81,7 +81,7 @@ describe('CachedItemStoreImpl', () => {
                 // arrange
                 const mockKeyValueStore = container.get<KeyValueStore>(InjectionTokens.KEY_VALUE_STORE);
                 const now = Date.now();
-                spyOn(mockKeyValueStore, 'setValue').and.callThrough();
+                jest.spyOn(mockKeyValueStore, 'setValue').mockImplementation();
 
                 // act
                 const r1 = await cachedItemStore.getCached<{}>(
@@ -126,7 +126,7 @@ describe('CachedItemStoreImpl', () => {
                     // arrange
                     const mockKeyValueStore = container.get<KeyValueStore>(InjectionTokens.KEY_VALUE_STORE);
                     const now = Date.now();
-                    spyOn(mockKeyValueStore, 'setValue').and.callThrough();
+                    jest.spyOn(mockKeyValueStore, 'setValue').mockImplementation();
 
                     // act
                     cachedItemStore.getCached<Sample>(
@@ -151,7 +151,7 @@ describe('CachedItemStoreImpl', () => {
                     // arrange
                     const mockKeyValueStore = container.get<KeyValueStore>(InjectionTokens.KEY_VALUE_STORE);
                     const now = Date.now();
-                    spyOn(mockKeyValueStore, 'setValue').and.callThrough();
+                    jest.spyOn(mockKeyValueStore, 'setValue').mockImplementation();
 
                     // act
                     cachedItemStore.getCached<Sample>(
@@ -175,7 +175,7 @@ describe('CachedItemStoreImpl', () => {
                 //     // arrange
                 //     const mockKeyValueStore = container.get<KeyValueStore>(InjectionTokens.KEY_VALUE_STORE);
                 //     const now = Date.now();
-                //     spyOn(mockKeyValueStore, 'setValue').and.callThrough();
+                //     jest.spyOn(mockKeyValueStore, 'setValue').mockImplementation();
 
                 //     // act
                 //     cachedItemStore.getCached<Sample>(
@@ -203,8 +203,8 @@ describe('CachedItemStoreImpl', () => {
                 //     // arrange
                 //     const mockKeyValueStore = container.get<KeyValueStore>(InjectionTokens.KEY_VALUE_STORE);
                 //     const now = Date.now();
-                //     spyOn(mockKeyValueStore, 'setValue').and.callThrough();
-                //     spyOn(mockKeyValueStore, 'getValue').and.callThrough();
+                //     jest.spyOn(mockKeyValueStore, 'setValue').mockImplementation();
+                //     jest.spyOn(mockKeyValueStore, 'getValue').mockImplementation();
 
                 //     // act
                 //     await cachedItemStore.getCached<Sample>(
@@ -238,8 +238,8 @@ describe('CachedItemStoreImpl', () => {
                     // arrange
                     const mockKeyValueStore = container.get<KeyValueStore>(InjectionTokens.KEY_VALUE_STORE);
                     const now = Date.now();
-                    spyOn(mockKeyValueStore, 'setValue').and.callThrough();
-                    spyOn(mockKeyValueStore, 'getValue').and.callThrough();
+                    jest.spyOn(mockKeyValueStore, 'setValue').mockImplementation();
+                    jest.spyOn(mockKeyValueStore, 'getValue').mockImplementation();
 
                     // act
                     await cachedItemStore.getCached<Sample>(

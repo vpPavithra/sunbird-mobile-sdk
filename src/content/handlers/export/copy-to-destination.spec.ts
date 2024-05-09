@@ -52,7 +52,7 @@ describe('CopyToDestination', () => {
         copyToDestination = new CopyToDestination();
 
         response.body = exportContext;
-        spyOn(sbutility, 'copyFile').and.callFake((a, b, c, d, e) => {
+        jest.spyOn(sbutility, 'copyFile').mockReturnValue((a, b, c, d, e) => {
             setTimeout(() => {
                 setTimeout(() => {
                     d();
@@ -99,7 +99,7 @@ describe('CopyToDestination', () => {
         copyToDestination = new CopyToDestination();
 
         response.body = exportContext;
-        spyOn(sbutility, 'copyFile').and.callFake((a, b, c, d, e) => {
+        jest.spyOn(sbutility, 'copyFile').mockReturnValue((a, b, c, d, e) => {
             setTimeout(() => {
                 setTimeout(() => {
                     e();

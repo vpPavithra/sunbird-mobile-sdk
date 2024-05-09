@@ -101,7 +101,7 @@ describe('GetContentDetailsHandler', () => {
                 result: 'sample_result'
             }
         }));
-        spyOn(getContentDetailsHandler, 'fetchFromServer').and.returnValue(of([]));
+        jest.spyOn(getContentDetailsHandler, 'fetchFromServer').mockReturnValue(of([])as any);
         getContentDetailsHandler.handle(request).subscribe(() => {
             // assert
             expect(mockDbService.read).toHaveBeenCalled();
@@ -132,7 +132,7 @@ describe('GetContentDetailsHandler', () => {
                 }
             }
         }));
-        spyOn(getContentDetailsHandler, 'fetchFromDB').and.returnValue(of([]));
+        jest.spyOn(getContentDetailsHandler, 'fetchFromDB').mockReturnValue(of([])as any);
         ContentMapper.mapContentDBEntryToContent = jest.fn().mockImplementation(() => {
         });
         (ContentMapper.mapContentDBEntryToContent as jest.Mock).mockReturnValue((req_data.content));

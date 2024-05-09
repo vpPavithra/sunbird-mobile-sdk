@@ -77,6 +77,7 @@ import {SharedPreferencesLocalStorage} from '../../util/shared-preferences/impl/
 import {ContentAggregator} from '../handlers/content-aggregator';
 import { QuestionSetFileReadHandler } from '../handlers/question-set-file-read-handler';
 import { GetChildQuestionSetHandler } from '../handlers/get-child-question-set-handler';
+import { Device } from '@capacitor/device';
 
 
 jest.mock('../handlers/search-content-handler');
@@ -101,6 +102,14 @@ jest.mock('../handlers/import/extract-payloads');
 jest.mock('../handlers/import/create-content-import-manifest');
 jest.mock('../handlers/content-aggregator');
 
+jest.mock('@capacitor/device', () => {
+    return {
+      ...jest.requireActual('@capacitor/device'),
+        Device: {
+            getInfo: jest.fn(() => Promise.resolve())
+        }
+    }
+})
 describe('ContentServiceImpl', () => {
     let contentService: ContentService;
 
@@ -373,13 +382,13 @@ describe('ContentServiceImpl', () => {
             };
             contentService = container.get(InjectionTokens.CONTENT_SERVICE);
             mockSharedPreferences.getString = jest.fn().mockImplementation(() => of('[{"identifiers": "sample-id"}]'));
-            spyOn(mockApiService, 'fetch').and.returnValue(of({
+            jest.spyOn(mockApiService, 'fetch').mockReturnValue(of({
                 body: {
                     result: {
                         response: 'SAMPLE_RESPONSE'
                     }
                 }
-            }));
+            }) as any);
             // act
             contentService.searchContent(request).subscribe(() => {
                 // assert
@@ -411,13 +420,13 @@ describe('ContentServiceImpl', () => {
             };
             contentService = container.get(InjectionTokens.CONTENT_SERVICE);
             mockSharedPreferences.getString = jest.fn().mockImplementation(() => of('[{"identifiers": "sample-id"}]'));
-            spyOn(mockApiService, 'fetch').and.returnValue(of({
+            jest.spyOn(mockApiService, 'fetch').mockReturnValue(of({
                 body: {
                     result: {
                         response: 'SAMPLE_RESPONSE'
                     }
                 }
-            }));
+            }) as any);
             // act
             contentService.searchContent(request, {limit: 5}).subscribe(() => {
                 // assert
@@ -457,7 +466,7 @@ describe('ContentServiceImpl', () => {
                 [ContentEntry.COLUMN_NAME_PRIMARY_CATEGORY]: ''
             };
             const val = new Map();
-            const n: NodeJS.Timeout  = setTimeout( () =>  { /* snip */  }, 500);
+            const n = setTimeout( () =>  { /* snip */  }, 500);
             val.set('SAMPLE_CONTENT_ID', n);
             contentUpdateSizeOnDeviceTimeoutRef.get = jest.fn(() => n) as any;
             const fetchData = jest.fn().mockImplementation(() => of(contents));
@@ -1104,7 +1113,7 @@ describe('ContentServiceImpl', () => {
             mockFileService.listDir = jest.fn().mockImplementation(() => Promise.resolve([{
                 name: 'ENTRY_NAME'
             }]));
-            spyOn(FileUtil, 'getFileExtension').and.returnValue('');
+            jest.spyOn(FileUtil, 'getFileExtension').mockReturnValue('');
             mockFileService.createDir = jest.fn().mockImplementation(() => Promise.resolve([{
                 name: 'sunbird'
             }]));
@@ -1204,7 +1213,7 @@ describe('ContentServiceImpl', () => {
                 contentImportArray: contentImport,
                 contentStatusArray: ['SAMPLE_1', 'SAMPLE_2']
             };
-            spyOn(mockApiService, 'fetch').and.returnValue(of({
+            jest.spyOn(mockApiService, 'fetch').mockReturnValue(of({
                 body: {
                     result: {
                         response: 'SAMPLE_RESPONSE',
@@ -1214,7 +1223,7 @@ describe('ContentServiceImpl', () => {
                         }]
                     }
                 }
-            }));
+            }) as any);
             const getDownloadUrlData = jest.fn(() => Promise.resolve('ecar'));
             const getContentSearchFilterData = jest.fn(() => Promise.resolve({}));
             (SearchContentHandler as jest.Mock<SearchContentHandler>).mockImplementation(() => {
@@ -1249,7 +1258,7 @@ describe('ContentServiceImpl', () => {
                 contentImportArray: contentImport,
                 contentStatusArray: ['SAMPLE_1', 'SAMPLE_2']
             };
-            spyOn(mockApiService, 'fetch').and.returnValue(of({
+            jest.spyOn(mockApiService, 'fetch').mockReturnValue(of({
                 body: {
                     result: {
                         response: 'SAMPLE_RESPONSE',
@@ -1259,7 +1268,7 @@ describe('ContentServiceImpl', () => {
                         }]
                     }
                 }
-            }));
+            }) as any);
             const getDownloadUrlData = jest.fn(() => Promise.resolve('ecar'));
             const getContentSearchFilterData = jest.fn(() => Promise.resolve({}));
             (SearchContentHandler as jest.Mock<SearchContentHandler>).mockImplementation(() => {
@@ -1294,7 +1303,7 @@ describe('ContentServiceImpl', () => {
                 contentImportArray: contentImport,
                 contentStatusArray: ['SAMPLE_1', 'SAMPLE_2']
             };
-            spyOn(mockApiService, 'fetch').and.returnValue(of({
+            jest.spyOn(mockApiService, 'fetch').mockReturnValue(of({
                 body: {
                     result: {
                         response: 'SAMPLE_RESPONSE',
@@ -1304,7 +1313,7 @@ describe('ContentServiceImpl', () => {
                         }]
                     }
                 }
-            }));
+            }) as any);
             (SearchContentHandler as jest.Mock<SearchContentHandler>).mockImplementation(() => {
                 return {
                     getDownloadUrl: jest.fn(() => Promise.resolve('ecar')),
@@ -1333,13 +1342,13 @@ describe('ContentServiceImpl', () => {
                 contentImportArray: contentImport,
                 contentStatusArray: ['SAMPLE_1', 'SAMPLE_2']
             };
-            spyOn(mockApiService, 'fetch').and.returnValue(of({
+            jest.spyOn(mockApiService, 'fetch').mockReturnValue(of({
                 body: {
                     result: {
                         response: 'SAMPLE_RESPONSE'
                     }
                 }
-            }));
+            }) as any);
             const getDownloadUrlData = jest.fn(() => Promise.resolve('ecar'));
             const getContentSearchFilterData = jest.fn(() => Promise.resolve({}));
             (SearchContentHandler as jest.Mock<SearchContentHandler>).mockImplementation(() => {
@@ -1625,6 +1634,7 @@ describe('ContentServiceImpl', () => {
                 destinationUrl: 'sample/files/fileName',
                 identifier: 'sample-id'
             };
+            Device.getInfo = jest.fn(() => Promise.resolve()) as any
             mockFileService.exists = jest.fn(() => Promise.resolve({
                 nativeURL: 'sample-native-URL'
             })) as any;

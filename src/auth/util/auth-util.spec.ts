@@ -10,6 +10,7 @@ import {AuthKeys} from '../../preference-keys';
 import {NoActiveSessionError} from '../../profile';
 import {AuthTokenRefreshError} from '../errors/auth-token-refresh-error';
 import { JwtUtil } from '../../util/jwt-util';
+import { Browser } from '@capacitor/browser';
 
 jest.mock('@project-sunbird/client-services', () => {
   return {
@@ -162,9 +163,9 @@ describe('AuthUtil', () => {
       const mockSharedPreferences: SharedPreferences = instance(MockSharedPreferences);
       const mockEventsBusService: EventsBusService = instance(MockEventsBusService);
 
-      spyOn(window['cordova'].InAppBrowser, 'open').and.returnValue(
+      Browser.addListener = jest.fn((fn) => Promise.resolve(
         {
-          addEventListener: (event: string, cb) => {
+          remove: (event: string, cb) => {
             if (event === 'exit') {
               setTimeout(() => {
                 cb();
@@ -172,7 +173,7 @@ describe('AuthUtil', () => {
             }
           }
         }
-      );
+      )) as any
 
       const authUtil = new AuthUtil(
         mockApConfig,
@@ -198,13 +199,10 @@ describe('AuthUtil', () => {
       when(MockSharedPreferences.putString(anyString(), anyString())).thenReturn(of(undefined));
       const mockSharedPreferences: SharedPreferences = instance(MockSharedPreferences);
       const mockEventsBusService: EventsBusService = instance(MockEventsBusService);
-
-      spyOn(window['cordova'].InAppBrowser, 'open').and.returnValue(
+      Browser.addListener = jest.fn((fn) => Promise.resolve(
         {
-          removeEventListener: () => {},
-          close: () => {},
-          addEventListener: (event: string, cb) => {
-            if (event === 'loadstart') {
+          remove: (event: string, cb) => {
+            if (event === 'exit') {
               setTimeout(() => {
                 cb({
                   url: 'SAMPLE_URL/oauth2callback'
@@ -213,8 +211,7 @@ describe('AuthUtil', () => {
             }
           }
         }
-      );
-
+      )) as any
       const authUtil = new AuthUtil(
         mockApConfig,
         mockApiService,
@@ -244,7 +241,7 @@ describe('AuthUtil', () => {
         mockEventsBusService
       );
 
-      spyOn(authUtil, 'getSessionData').and.returnValue(Promise.resolve(undefined));
+      jest.spyOn(authUtil, 'getSessionData').mockReturnValue(Promise.resolve(undefined));
 
       // act
       authUtil.refreshSession().catch((e) => {
@@ -271,7 +268,7 @@ describe('AuthUtil', () => {
         mockEventsBusService
       );
 
-      spyOn(authUtil, 'getSessionData').and.returnValue(Promise.resolve({
+      jest.spyOn(authUtil, 'getSessionData').mockReturnValue(Promise.resolve({
         access_token: 'SAMPLE_ACCESS_TOKEN',
         refresh_token: 'SAMPLE_REFRESH_TOKEN',
         userToken: 'SAMPLE_USER_TOKEN'
@@ -306,7 +303,7 @@ describe('AuthUtil', () => {
         mockEventsBusService
       );
 
-      spyOn(authUtil, 'getSessionData').and.returnValue(Promise.resolve({
+      jest.spyOn(authUtil, 'getSessionData').mockReturnValue(Promise.resolve({
         access_token: 'SAMPLE_ACCESS_TOKEN',
         refresh_token: 'SAMPLE_REFRESH_TOKEN',
         userToken: 'SAMPLE_USER_TOKEN'
@@ -345,7 +342,7 @@ describe('AuthUtil', () => {
         mockEventsBusService
       );
 
-      spyOn(authUtil, 'getSessionData').and.returnValue(Promise.resolve({
+      jest.spyOn(authUtil, 'getSessionData').mockReturnValue(Promise.resolve({
         access_token: 'SAMPLE_ACCESS_TOKEN',
         refresh_token: 'SAMPLE_REFRESH_TOKEN',
         userToken: 'SAMPLE_USER_TOKEN'
@@ -382,7 +379,7 @@ describe('AuthUtil', () => {
       const mockSharedPreferences: SharedPreferences = instance(MockSharedPreferences);
       const mockEventsBusService: EventsBusService = instance(MockEventsBusService);
 
-      spyOn(mockSharedPreferences, 'putString').and.callThrough();
+      jest.spyOn(mockSharedPreferences, 'putString').mockImplementation();
 
       const authUtil = new AuthUtil(
           mockApConfig,
@@ -391,9 +388,9 @@ describe('AuthUtil', () => {
           mockEventsBusService
       );
 
-      spyOn(authUtil, 'startSession').and.stub();
+      jest.spyOn(authUtil, 'startSession').mockImplementation();
 
-      spyOn(authUtil, 'getSessionData').and.returnValue(Promise.resolve({
+      jest.spyOn(authUtil, 'getSessionData').mockReturnValue(Promise.resolve({
         access_token: 'SAMPLE_ACCESS_TOKEN',
         refresh_token: 'SAMPLE_REFRESH_TOKEN',
         userToken: 'SAMPLE_USER_TOKEN'

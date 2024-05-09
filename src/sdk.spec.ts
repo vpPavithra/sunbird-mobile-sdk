@@ -249,7 +249,7 @@ describe('sdk', () => {
     describe('getters', () => {
         it('should return services for respective getters', () => {
             const mockContainer = new Container();
-            spyOn(mockContainer, 'get').and.callFake(() => undefined);
+            jest.spyOn(mockContainer, 'get').mockReturnValue(undefined);
             sdkInstance['_container'] = mockContainer;
 
             sdkInstance.telemetryService;

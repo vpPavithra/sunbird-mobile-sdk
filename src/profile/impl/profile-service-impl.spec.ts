@@ -155,8 +155,8 @@ describe.only('ProfileServiceImpl', () => {
                 }));
             });
             jest.spyOn(UniqueId, 'generateUniqueId').mockImplementation(() => 'SECRET')
-            spyOn(profileService, 'createProfile').and.stub();
-            spyOn(profileService, 'setActiveSessionForProfile').and.returnValue(of(true));
+            jest.spyOn(profileService, 'createProfile').mockImplementation();
+            jest.spyOn(profileService, 'setActiveSessionForProfile').mockReturnValue(of(true));
 
             profileService.preInit().subscribe(() => {
                 // assert
@@ -169,10 +169,10 @@ describe.only('ProfileServiceImpl', () => {
         it('should create new Profile and Session if no Profile exists on preInit()', (done) => {
             // arrange
             mockSharedPreferences.getString = jest.fn().mockImplementation(() => of(undefined));
-            spyOn(profileService, 'createProfile').and.returnValue(of({
+            jest.spyOn(profileService, 'createProfile').mockReturnValue(of({
                 uid: 'SAMPLE_UID'
-            }) as Partial<ProfileSession>);
-            spyOn(profileService, 'setActiveSessionForProfile').and.returnValue(of(true));
+            }) as any);
+            jest.spyOn(profileService, 'setActiveSessionForProfile').mockReturnValue(of(true));
 
             // act
             profileService.preInit().subscribe(() => {
@@ -212,9 +212,9 @@ describe.only('ProfileServiceImpl', () => {
 
             mockAuthService.setSession = jest.fn().mockImplementation(() => of({
             }));
-            spyOn(profileService, 'createProfile').and.stub();
-            spyOn(profileService, 'setActiveSessionForProfile').and.returnValue(of(true));
-            spyOn(profileService, 'getServerProfilesDetails').and.returnValue(of({rootOrgId: 'sample_rootorg_id'}));
+            jest.spyOn(profileService, 'createProfile').mockImplementation();
+            jest.spyOn(profileService, 'setActiveSessionForProfile').mockReturnValue(of(true));
+            jest.spyOn(profileService, 'getServerProfilesDetails').mockReturnValue(of({rootOrgId: 'sample_rootorg_id'}) as any);
             mockFrameworkService.setActiveChannelId = jest.fn().mockImplementation(() => of({
             }));
             // act
@@ -413,7 +413,7 @@ describe.only('ProfileServiceImpl', () => {
             // arrange
             mockDbService.read = jest.fn().mockImplementation(() => of([{} as Partial<ProfileEntry.SchemaMap>]));
             mockDbService.delete = jest.fn().mockImplementation(() => of(undefined));
-            // spyOn(profileService, 'getActiveProfileSession').and.returnValue(of(new ProfileSession('SAMPLE_UID')));
+            // jest.spyOn(profileService, 'getActiveProfileSession').mockReturnValue(of(new ProfileSession('SAMPLE_UID')));
             jest.spyOn(UniqueId, 'generateUniqueId').mockImplementation(() => 'SECRET')
             // act
             return await profileService.deleteProfile('SAMPLE_UID').toPromise().then(() => {
@@ -461,7 +461,7 @@ describe.only('ProfileServiceImpl', () => {
                 [ProfileEntry.COLUMN_NAME_SOURCE]: ProfileSource.LOCAL,
             } as ProfileEntry.SchemaMap]));
             mockDbService.update = jest.fn().mockImplementation(() => of(undefined));
-            // spyOn(profileService, 'getActiveProfileSession').and.returnValue(of(new ProfileSession('SAMPLE_UID')));
+            // jest.spyOn(profileService, 'getActiveProfileSession').mockReturnValue(of(new ProfileSession('SAMPLE_UID')));
             jest.spyOn(UniqueId, 'generateUniqueId').mockImplementation(() => 'SECRET')
             // act
             profileService.updateProfile(profile).subscribe(() => {
@@ -860,7 +860,7 @@ describe.only('ProfileServiceImpl', () => {
             // arrange
             const request = {requiredFields: []} as Pick<ServerProfileDetailsRequest, 'requiredFields'>;
             mockDbService.read = jest.fn().mockImplementation(() => of([]));
-            spyOn(profileService, 'getActiveProfileSession').and.returnValue(of({uid: 'SAMPLE_UID'}));
+            jest.spyOn(profileService, 'getActiveProfileSession').mockReturnValue(of({uid: 'SAMPLE_UID'}) as any);
 
             // act
             profileService.getActiveSessionProfile(request).subscribe(null, (e) => {
@@ -875,7 +875,7 @@ describe.only('ProfileServiceImpl', () => {
             mockDbService.read = jest.fn().mockImplementation(() => of([{
                 [ProfileEntry.COLUMN_NAME_UID]: 'SAMPLE_UID'
             }]));
-            spyOn(profileService, 'getActiveProfileSession').and.returnValue(of({uid: 'SAMPLE_UID'}));
+            jest.spyOn(profileService, 'getActiveProfileSession').mockReturnValue(of({uid: 'SAMPLE_UID'}) as any);
 
             // act
             profileService.getActiveSessionProfile(request).subscribe((res) => {
@@ -891,8 +891,8 @@ describe.only('ProfileServiceImpl', () => {
                 [ProfileEntry.COLUMN_NAME_UID]: 'SAMPLE_UID',
                 [ProfileEntry.COLUMN_NAME_SOURCE]: ProfileSource.SERVER
             }]));
-            spyOn(profileService, 'getActiveProfileSession').and.returnValue(of({uid: 'SAMPLE_UID'}));
-            spyOn(profileService, 'getServerProfilesDetails').and.returnValue(of({uid: 'SAMPLE_UID'}));
+            jest.spyOn(profileService, 'getActiveProfileSession').mockReturnValue(of({uid: 'SAMPLE_UID'}) as any);
+            jest.spyOn(profileService, 'getServerProfilesDetails').mockReturnValue(of({uid: 'SAMPLE_UID'}) as any);
 
             // act
             profileService.getActiveSessionProfile(request).subscribe((res) => {
@@ -940,7 +940,7 @@ describe.only('ProfileServiceImpl', () => {
                 },
                 services: {}
             });
-            spyOn(CsModule.instance, 'updateConfig').and.returnValue(undefined);
+            jest.spyOn(CsModule.instance, 'updateConfig').mockReturnValue(undefined);
 
             // act
             profileService.setActiveSessionForProfile('SAMPLE_UID').subscribe((res) => {
@@ -1019,11 +1019,11 @@ describe.only('ProfileServiceImpl', () => {
                 }
             ]));
             jest.spyOn(UniqueId, 'generateUniqueId').mockImplementation(() => 'SECRET')
-            spyOn(profileService, 'getServerProfilesDetails').and.returnValue(of({
+            jest.spyOn(profileService, 'getServerProfilesDetails').mockReturnValue(of({
                 rootOrg: {
                     hashTagId: 'SAMPLE_ROOT_ORG_ID'
                 }
-            }));
+            }) as any);
             mockFrameworkService.setActiveChannelId = jest.fn().mockImplementation(() => of(undefined));
             mockSharedPreferences.putString = jest.fn().mockImplementation(() => of(undefined));
 

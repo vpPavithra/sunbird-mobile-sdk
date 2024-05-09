@@ -127,7 +127,7 @@ describe('AppInfoImpl', () => {
                 },
                 services: {}
             });
-            spyOn(CsModule.instance, 'updateConfig').and.returnValue(undefined);
+            jest.spyOn(CsModule.instance, 'updateConfig').mockReturnValue(undefined);
             // act
             appInfoImpl.init().then(() => {
                 // assert
@@ -199,7 +199,7 @@ describe('AppInfoImpl', () => {
             mockSdkConfigApi as SdkConfig,
             mockSharedPreferences as SharedPreferences
         );
-        spyOn(sbutility, 'getBuildConfigValue').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'getBuildConfigValue').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                 c('2.6.0'),
                 d('buildConfig_error');

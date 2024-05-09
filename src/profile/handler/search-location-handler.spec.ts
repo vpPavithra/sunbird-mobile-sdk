@@ -41,13 +41,13 @@ describe('SearchLocationHandler', () => {
         mockApiService.fetch =  jest.fn().mockImplementation(() => of({ body: {result: ''}}));
         mockCachedItemStore.getCached = jest.fn().mockImplementation((a, b, c, d, e, f) => d());
         mockFileService.readFileFromAssets = jest.fn().mockImplementation(() => []);
-        spyOn(mockApiService, 'fetch').and.returnValue(of({
+        jest.spyOn(mockApiService, 'fetch').mockReturnValue(of({
             body: {
                 result: {
                     response: 'SAMPLE_RESPONSE'
                 }
             }
-        }));
+        }) as any);
         // act
         searchLocationHandler.handle(request).subscribe(() => {
             expect(mockCachedItemStore.getCached).toHaveBeenCalled();

@@ -113,7 +113,7 @@ describe('GroupServiceImpl', () => {
     it('should return getActiveSessionGroup Using ProfileService', () => {
         // arrange
         mockDbService.read = jest.fn().mockImplementation(() => of([]));
-        spyOn(groupService, 'getActiveGroupSession').and.returnValue(of([]));
+        jest.spyOn(groupService, 'getActiveGroupSession').mockReturnValue(of([]) as any);
         // act
         groupService.getActiveSessionGroup().subscribe(() => {
             // assert
@@ -129,7 +129,7 @@ describe('GroupServiceImpl', () => {
         (mockDbService.read as jest.Mock).mockResolvedValue(of([]));
         mockSharedPreferences.putString = jest.fn().mockImplementation(() => of([]));
         (mockSharedPreferences.putString as jest.Mock).mockReturnValue(of(''));
-        spyOn(groupService, 'setActiveSessionForGroup').and.returnValue(of([]));
+        jest.spyOn(groupService, 'setActiveSessionForGroup').mockReturnValue(of([]) as any);
         // act
         groupService.setActiveSessionForGroup(gid).subscribe(() => {
             // assert

@@ -18,7 +18,7 @@ describe('SharedPreferencesAndroid', () => {
 
     describe('getString()', () => {
         it('should delegate to cordova sharedPreferences', (done) => {
-            spyOn(window['plugins'].SharedPreferences, 'getInstance').and.returnValue({
+            jest.spyOn(window['plugins'].SharedPreferences, 'getInstance').mockReturnValue({
                 getString: (a, b, c, d) => {
                     setTimeout(() => {
                         c('SOME_VALUE');
@@ -41,7 +41,7 @@ describe('SharedPreferencesAndroid', () => {
                 }, 0);
             });
 
-            spyOn(window['plugins'].SharedPreferences, 'getInstance').and.returnValue({
+            jest.spyOn(window['plugins'].SharedPreferences, 'getInstance').mockReturnValue({
                 getString: (a, b, c, d) => {
                     setTimeout(() => {
                         c('SOME_VALUE');
@@ -61,7 +61,7 @@ describe('SharedPreferencesAndroid', () => {
         });
 
         it('should delegate to cordova sharedPreferences', (done) => {
-            spyOn(window['plugins'].SharedPreferences, 'getInstance').and.returnValue({
+            jest.spyOn(window['plugins'].SharedPreferences, 'getInstance').mockReturnValue({
                 getString: (a, b, c, d) => {
                     setTimeout(() => {
                         d('SOME_ERROR');
@@ -80,7 +80,7 @@ describe('SharedPreferencesAndroid', () => {
 
     describe('putString()', () => {
         it('should delegate to cordova sharedPreferences', (done) => {
-            spyOn(window['plugins'].SharedPreferences, 'getInstance').and.returnValue({
+            jest.spyOn(window['plugins'].SharedPreferences, 'getInstance').mockReturnValue({
                 putString: (a, b, c, d) => {
                     setTimeout(() => {
                         c();
@@ -96,7 +96,7 @@ describe('SharedPreferencesAndroid', () => {
         });
 
         it('should delegate to cordova sharedPreferences', (done) => {
-            spyOn(window['plugins'].SharedPreferences, 'getInstance').and.returnValue({
+            jest.spyOn(window['plugins'].SharedPreferences, 'getInstance').mockReturnValue({
                 putString: (a, b, c, d) => {
                     setTimeout(() => {
                         d('SOME_ERROR');
@@ -115,7 +115,7 @@ describe('SharedPreferencesAndroid', () => {
 
     describe('getBoolean()', () => {
         it('should delegate to cordova sharedPreferences', (done) => {
-            spyOn(window['plugins'].SharedPreferences, 'getInstance').and.returnValue({
+            jest.spyOn(window['plugins'].SharedPreferences, 'getInstance').mockReturnValue({
                 getBoolean: (a, b, c, d) => {
                     setTimeout(() => {
                         c(true);
@@ -132,7 +132,7 @@ describe('SharedPreferencesAndroid', () => {
         });
 
         it('should delegate to cordova sharedPreferences', (done) => {
-            spyOn(window['plugins'].SharedPreferences, 'getInstance').and.returnValue({
+            jest.spyOn(window['plugins'].SharedPreferences, 'getInstance').mockReturnValue({
                 getBoolean: (a, b, c, d) => {
                     setTimeout(() => {
                         d('SOME_ERROR');
@@ -155,7 +155,7 @@ describe('SharedPreferencesAndroid', () => {
                 }, 0);
             });
 
-            spyOn(window['plugins'].SharedPreferences, 'getInstance').and.returnValue({
+            jest.spyOn(window['plugins'].SharedPreferences, 'getInstance').mockReturnValue({
                 getBoolean: (a, b, c, d) => {
                     setTimeout(() => {
                         d('SOME_ERROR');
@@ -181,7 +181,7 @@ describe('SharedPreferencesAndroid', () => {
                 }, 0);
             });
 
-            spyOn(window['plugins'].SharedPreferences, 'getInstance').and.returnValue({
+            jest.spyOn(window['plugins'].SharedPreferences, 'getInstance').mockReturnValue({
                 getBoolean: (a, b, c, d) => {
                     setTimeout(() => {
                         d('SOME_ERROR');
@@ -203,7 +203,7 @@ describe('SharedPreferencesAndroid', () => {
 
     describe('putBoolean()', () => {
         it('should delegate to cordova sharedPreferences', (done) => {
-            spyOn(window['plugins'].SharedPreferences, 'getInstance').and.returnValue({
+            jest.spyOn(window['plugins'].SharedPreferences, 'getInstance').mockReturnValue({
                 putBoolean: (a, b, c, d) => {
                     setTimeout(() => {
                         c(true);
@@ -219,7 +219,7 @@ describe('SharedPreferencesAndroid', () => {
         });
 
         it('should delegate to cordova sharedPreferences', (done) => {
-            spyOn(window['plugins'].SharedPreferences, 'getInstance').and.returnValue({
+            jest.spyOn(window['plugins'].SharedPreferences, 'getInstance').mockReturnValue({
                 putBoolean: (a, b, c, d) => {
                     setTimeout(() => {
                         d('SOME_ERROR');

@@ -1,6 +1,7 @@
 import {WebviewRunner} from '../def/webview-runner';
 import {WebviewRunnerImpl} from './webview-runner-impl';
 import {NoInappbrowserSessionAssertionFailError, ParamNotCapturedError} from '../../..';
+import { Browser } from '@capacitor/browser';
 
 describe('WebviewRunnerImpl', () => {
     let webviewRunner: WebviewRunner;
@@ -20,7 +21,7 @@ describe('WebviewRunnerImpl', () => {
     describe('launchWebview', () => {
         it('should open a cordova InAppBrowser instance', (done) => {
             // arrange
-            spyOn(window['cordova']['InAppBrowser'], 'open').and.returnValue(new EventTarget());
+            jest.spyOn(window['cordova']['InAppBrowser'], 'open').mockReturnValue(new EventTarget());
 
             // act
             webviewRunner.launchWebview({
@@ -42,8 +43,8 @@ describe('WebviewRunnerImpl', () => {
         it('should register an exit eventListener on cordova InAppBrowser instance', (done) => {
             // arrange
             const eventTarget = new EventTarget();
-            spyOn(eventTarget, 'addEventListener').and.callThrough();
-            spyOn(window['cordova']['InAppBrowser'], 'open').and.returnValue(eventTarget);
+            jest.spyOn(eventTarget, 'addEventListener').mockImplementation();
+            jest.spyOn(window['cordova']['InAppBrowser'], 'open').mockReturnValue(eventTarget);
 
             // act
             webviewRunner.launchWebview({
@@ -62,11 +63,12 @@ describe('WebviewRunnerImpl', () => {
             // arrange
             let exitCallback;
             const eventTarget = new EventTarget();
-            spyOn(eventTarget, 'addEventListener').and.callFake((event, cb) => {
-                exitCallback = cb;
+            jest.spyOn(eventTarget, 'addEventListener').mockImplementation((event, cb) => {
+                // Mock implementation here, if needed
+                // For example, you can store the event type and callback function for later use
             });
-            spyOn(eventTarget, 'removeEventListener').and.callThrough();
-            spyOn(window['cordova']['InAppBrowser'], 'open').and.returnValue(eventTarget);
+            jest.spyOn(eventTarget, 'removeEventListener').mockImplementation();
+            jest.spyOn(window['cordova']['InAppBrowser'], 'open').mockReturnValue(eventTarget);
 
             // act
             webviewRunner.launchWebview({
@@ -100,7 +102,7 @@ describe('WebviewRunnerImpl', () => {
             const eventTarget = new EventTarget();
             const close = jest.fn().mockImplementation();
             eventTarget['close'] = close;
-            spyOn(window['cordova']['InAppBrowser'], 'open').and.returnValue(eventTarget);
+            jest.spyOn(window['cordova']['InAppBrowser'], 'open').mockReturnValue(eventTarget);
 
             // act
             webviewRunner.launchWebview({
@@ -150,13 +152,13 @@ describe('WebviewRunnerImpl', () => {
     describe('launchCustomTab', () => {
         it('should launch customtabs if available', (done) => {
             // arrange
-            spyOn(window['customtabs'], 'isAvailable').and.callFake((success, error) => {
+            jest.spyOn(window['customtabs'], 'isAvailable').mockImplementation((success, error) => {
                 setTimeout(() => {
                     success();
                 });
             });
 
-            spyOn(window['customtabs'], 'launch').and.callFake((url, success, error) => {
+            jest.spyOn(window['customtabs'], 'launch').mockImplementation((url, success, error) => {
                 setTimeout(() => {
                     success({ 'PARAM': 'VALUE' });
                 });
@@ -179,13 +181,13 @@ describe('WebviewRunnerImpl', () => {
 
         it('should launch customtabs if available and throws error', () => {
             // arrange
-            spyOn(window['customtabs'], 'isAvailable').and.callFake((success, error) => {
+            jest.spyOn(window['customtabs'], 'isAvailable').mockImplementation((success, error) => {
                 setTimeout(() => {
                     success();
                 });
             });
 
-            spyOn(window['customtabs'], 'launch').and.callFake((url, success, error) => {
+            jest.spyOn(window['customtabs'], 'launch').mockImplementation((url, success, error) => {
                 setTimeout(() => {
                     error({ 'ERROR': 'VALUE' });
                 });
@@ -207,13 +209,13 @@ describe('WebviewRunnerImpl', () => {
 
         it('should launch in browser if not available', (done) => {
             // arrange
-            spyOn(window['customtabs'], 'isAvailable').and.callFake((success, error) => {
+            jest.spyOn(window['customtabs'], 'isAvailable').mockImplementation((success, error) => {
                 setTimeout(() => {
                     error();
                 });
             });
 
-            spyOn(window['customtabs'], 'launchInBrowser').and.callFake((url, extraParams, success, error) => {
+            jest.spyOn(window['customtabs'], 'launchInBrowser').mockImplementation((url, extraParams, success, error) => {
                 setTimeout(() => {
                     success({ 'PARAM': 'VALUE' });
                 });
@@ -236,13 +238,13 @@ describe('WebviewRunnerImpl', () => {
 
         it('should launch in browser if not available and throw error', () => {
             // arrange
-            spyOn(window['customtabs'], 'isAvailable').and.callFake((success, error) => {
+            jest.spyOn(window['customtabs'], 'isAvailable').mockImplementation((success, error) => {
                 setTimeout(() => {
                     success();
                 });
             });
 
-            spyOn(window['customtabs'], 'launchInBrowser').and.callFake((url, extraParams, success, error) => {
+            jest.spyOn(window['customtabs'], 'launchInBrowser').mockImplementation((url, extraParams, success, error) => {
                 setTimeout(() => {
                     error({ 'ERROR': 'VALUE' });
                 });
@@ -284,11 +286,11 @@ describe('WebviewRunnerImpl', () => {
             // arrange
             let loadstartCallback;
             const eventTarget = new EventTarget();
-            spyOn(eventTarget, 'addEventListener').and.callFake((event, cb) => {
+            jest.spyOn(eventTarget, 'addEventListener').mockImplementation((event, cb) => {
                 loadstartCallback = cb;
             });
-            spyOn(eventTarget, 'removeEventListener').and.callThrough();
-            spyOn(window['cordova']['InAppBrowser'], 'open').and.returnValue(eventTarget);
+            jest.spyOn(eventTarget, 'removeEventListener').mockImplementation();
+            jest.spyOn(Browser, 'open').mockReturnValue(eventTarget as any);
 
             // act
             webviewRunner.launchWebview({
@@ -382,7 +384,7 @@ describe('WebviewRunnerImpl', () => {
             const eventTarget = new EventTarget();
             const executeScript = jest.fn().mockImplementation();
             eventTarget['executeScript'] = executeScript;
-            spyOn(window['cordova']['InAppBrowser'], 'open').and.returnValue(eventTarget);
+            jest.spyOn(window['cordova']['InAppBrowser'], 'open').mockReturnValue(eventTarget);
 
             // act
             webviewRunner.launchWebview({

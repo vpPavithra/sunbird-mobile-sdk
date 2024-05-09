@@ -25,13 +25,13 @@ describe('DeleteSourceFolder', () => {
 
     it('should update storage management for does not exist existing content', (done) => {
         // arrange
-        spyOn(sbutility, 'copyDirectory').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'copyDirectory').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                c();
                d();
             }, 0);
         });
-        spyOn(sbutility, 'rm').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'rm').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                 c(),
                 d();
@@ -70,13 +70,13 @@ describe('DeleteSourceFolder', () => {
 
     it('should update storage management ', (done) => {
         // arrange
-        spyOn(sbutility, 'copyDirectory').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'copyDirectory').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                c();
                d();
             }, 0);
         });
-        spyOn(sbutility, 'rm').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'rm').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                 c(),
                 d();
@@ -114,13 +114,13 @@ describe('DeleteSourceFolder', () => {
     });
     it('should delete source folder for same version', (done) => {
         // arrange
-        spyOn(sbutility, 'copyDirectory').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'copyDirectory').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                c();
                d();
             }, 0);
         });
-        spyOn(sbutility, 'rm').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'rm').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                 c(),
                 d();
@@ -159,13 +159,13 @@ describe('DeleteSourceFolder', () => {
 
     it('should delete source folder for switch case higher version', (done) => {
         // arrange
-        spyOn(sbutility, 'copyDirectory').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'copyDirectory').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                c();
                d();
             }, 0);
         });
-        spyOn(sbutility, 'rm').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'rm').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                 c(),
                 d();
@@ -203,13 +203,13 @@ describe('DeleteSourceFolder', () => {
     });
     it('should delete source folder for switch case lower version', (done) => {
         // arrange
-        spyOn(sbutility, 'copyDirectory').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'copyDirectory').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                c();
                d();
             }, 0);
         });
-        spyOn(sbutility, 'rm').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'rm').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                 c(),
                 d();
@@ -248,13 +248,13 @@ describe('DeleteSourceFolder', () => {
 
     it('should delete source folder for switch case lower version', (done) => {
         // arrange
-        spyOn(sbutility, 'copyDirectory').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'copyDirectory').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                c();
                d();
             }, 0);
         });
-        spyOn(sbutility, 'rm').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'rm').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                 c(),
                 d();

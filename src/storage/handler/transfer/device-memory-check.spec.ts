@@ -31,7 +31,7 @@ describe('DeviceMemoryCheck', () => {
 
     it('should check memory before file transfer operation', (done) => {
         // arrange
-        spyOn(sbutility, 'getFreeUsableSpace').and.callFake((a, b, c) => {
+        jest.spyOn(sbutility, 'getFreeUsableSpace').mockReturnValue((a, b, c) => {
             setTimeout(() => {
                 b();
                 c();

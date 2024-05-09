@@ -26,7 +26,7 @@ describe('ValidateDestinationFolder', () => {
 
     it('should create a directory and write ', (done) => {
         // arrange
-        spyOn(sbutility, 'canWrite').and.callFake((a, b, c) => {
+        jest.spyOn(sbutility, 'canWrite').mockReturnValue((a, b, c) => {
             setTimeout(() => {
                 b();
                 c();
@@ -75,7 +75,7 @@ describe('ValidateDestinationFolder', () => {
 
     it('should create a directory and write ', (done) => {
         // arrange
-        spyOn(sbutility, 'canWrite').and.callFake((a, b, c) => {
+        jest.spyOn(sbutility, 'canWrite').mockReturnValue((a, b, c) => {
             setTimeout(() => {
                 b();
                 c();

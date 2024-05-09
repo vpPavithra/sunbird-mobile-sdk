@@ -102,7 +102,7 @@ describe('ContentAggregator', () => {
                     mockContentService.getContents = jest.fn().mockImplementation(() => of(mockGetOfflineContentsResponse));
                     mockContentService.searchContent = jest.fn().mockImplementation(() => of(mockGetOnlineContentsResponse));
 
-                    spyOn(CsContentsGroupGenerator, 'generate').and.callThrough();
+                    jest.spyOn(CsContentsGroupGenerator, 'generate').mockImplementation();
 
                     // act
                     contentAggregator.aggregate({}, ['TRACKABLE_COLLECTIONS'], {
@@ -205,7 +205,7 @@ describe('ContentAggregator', () => {
                     mockContentService.getContents = jest.fn().mockImplementation(() => of(mockGetOfflineContentsResponseWithTwoSubjects));
                     mockContentService.searchContent = jest.fn().mockImplementation(() => of(mockGetOnlineContentsResponse));
 
-                    spyOn(CsContentsGroupGenerator, 'generate').and.callThrough();
+                    jest.spyOn(CsContentsGroupGenerator, 'generate').mockImplementation();
 
                     // act
                     contentAggregator.aggregate({
@@ -332,7 +332,7 @@ describe('ContentAggregator', () => {
                     mockContentService.getContents = jest.fn().mockImplementation(() => of(mockGetOfflineContentsResponseWithTwoSubjects));
                     mockContentService.searchContent = jest.fn().mockImplementation(() => of(mockGetOnlineContentsResponse));
 
-                    spyOn(CsContentsGroupGenerator, 'generate').and.callThrough();
+                    jest.spyOn(CsContentsGroupGenerator, 'generate').mockImplementation();
 
                     // act
                     contentAggregator.aggregate({
@@ -672,7 +672,7 @@ describe('ContentAggregator', () => {
         describe('when requesting with cacheable', () => {
             it('should request and return from cache', (done) => {
                 // arrange
-                spyOn(mockCachedItemStore, 'get').and.callThrough();
+                jest.spyOn(mockCachedItemStore, 'get').mockImplementation();
                 mockFormService.getForm = jest.fn().mockImplementation(() => of(mockFormResponse));
                 mockContentService.getContents = jest.fn().mockImplementation(() => of(mockGetOfflineContentsResponse));
                 mockContentService.searchContent = jest.fn().mockImplementation(() => of(mockGetOnlineContentsResponse));

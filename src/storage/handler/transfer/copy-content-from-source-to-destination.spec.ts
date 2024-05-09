@@ -29,13 +29,13 @@ describe('CopyContentFromSourceToDestination', () => {
 
     it('should handle storage transfer', (done) => {
         // arrange
-        spyOn(sbutility, 'rm').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'rm').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                 c(),
                 d();
             }, 0);
         });
-      //  spyOn(CancellationError, 'prototype').and.returnValue('CANCELLED');
+      //  jest.spyOn(CancellationError, 'prototype').mockReturnValue('CANCELLED');
         const rootContentsInDb: ContentEntry.SchemaMap[] = [{
             identifier: 'IDENTIFIER',
             server_data: 'SERVER_DATA',
@@ -61,7 +61,7 @@ describe('CopyContentFromSourceToDestination', () => {
 
     it('should handle storage transfer', (done) => {
         // arrange
-        spyOn(sbutility, 'copyDirectory').and.callFake((a, b, c, d) => {
+        jest.spyOn(sbutility, 'copyDirectory').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
                c();
                d();

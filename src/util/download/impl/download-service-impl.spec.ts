@@ -184,7 +184,7 @@ describe('DownloadServiceImpl', () => {
                 downloadService['sharedPreferencesSetCollection'].add(downloadRequest_1).toPromise();
                 downloadService['sharedPreferencesSetCollection'].add(downloadRequest_2).toPromise();
 
-                spyOn(downloadService, 'cancel').and.callThrough();
+                jest.spyOn(downloadService, 'cancel').mockImplementation();
 
                 // act
                 downloadService.onInit().pipe(take(2)).toPromise();

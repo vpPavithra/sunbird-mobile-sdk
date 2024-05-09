@@ -32,7 +32,7 @@ describe('EcarBundle', () => {
 
     it('should be zip file', async (done) => {
         // arrange
-        spyOn(mockZipService, 'zip').and.callFake(
+        jest.spyOn(mockZipService, 'zip').mockReturnValue(
             (a, b, c, d, e, f) => {
                 setTimeout(() => {
                     e();
