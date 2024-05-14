@@ -61,6 +61,7 @@ import {CsUserService} from '@project-sunbird/client-services/services/user';
 import {CsModule} from '@project-sunbird/client-services';
 import { UniqueId } from '../../db/util/unique-id';
 import { DeleteProfileDataHandler } from '../handler/delete-profile-data.handler';
+import { Browser } from '@capacitor/browser';
 
 jest.mock('../handler/tenant-info-handler');
 jest.mock('../handler/get-server-profile-details-handler');
@@ -409,7 +410,7 @@ describe.only('ProfileServiceImpl', () => {
     });
 
     describe('deleteProfile()', () => {
-        it('should delete profile from db on deleteProfile()', async (done) => {
+        it('should delete profile from db on deleteProfile()', async () => {
             // arrange
             mockDbService.read = jest.fn().mockImplementation(() => of([{} as Partial<ProfileEntry.SchemaMap>]));
             mockDbService.delete = jest.fn().mockImplementation(() => of(undefined));
@@ -423,11 +424,10 @@ describe.only('ProfileServiceImpl', () => {
                         table: ProfileEntry.TABLE_NAME
                     })
                 );
-                done();
             });
         });
 
-        it('should delete profile from db only if profile in db on deleteProfile()', async (done) => {
+        it('should delete profile from db only if profile in db on deleteProfile()', async () => {
             // arrange
             mockDbService.read = jest.fn().mockImplementation(() => of([]));
             mockDbService.delete = jest.fn().mockImplementation(() => of(undefined));
@@ -440,7 +440,6 @@ describe.only('ProfileServiceImpl', () => {
                     // assert
                     expect(err).toBeTruthy();
                     expect(mockDbService.delete).not.toHaveBeenCalled();
-                    done();
                 });
         });
     });
@@ -475,7 +474,7 @@ describe.only('ProfileServiceImpl', () => {
             });
         });
 
-        it('should update profile from db only if profile in db on updateProfile()', async (done) => {
+        it('should update profile from db only if profile in db on updateProfile()', async () => {
             // arrange
             const profile: Profile = {
                 uid: 'SAMPLE_UID',
@@ -495,7 +494,6 @@ describe.only('ProfileServiceImpl', () => {
                     expect(err).toBeTruthy();
                     expect(mockDbService.update).not.toHaveBeenCalled();
                     jest.clearAllTimers();
-                    done();
                 });
         });
     });
@@ -725,14 +723,14 @@ describe.only('ProfileServiceImpl', () => {
                     accessToken: 'SAMPLE_ACCESS_TOKEN_2'
                 }
             };
-            jest.spyOn(global['cordova']['InAppBrowser'], 'open').mockImplementation(() => {
+            Browser.open = jest.fn(() => {
                 return {
                     addEventListener: (_, cb) => {
                         cb({ url: 'xyz/oauth2callback' });
                     },
                     close: () => { }
                 };
-            });
+            }) as any;
             // act
             profileService.mergeServerProfiles(request).subscribe(() => {
                 // assert

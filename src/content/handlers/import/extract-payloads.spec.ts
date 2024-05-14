@@ -12,11 +12,20 @@ import { ContentUtil } from '../../util/content-util';
 import { ContentEntry } from '../../db/schema';
 import { Visibility, MimeType } from '../../util/content-constants';
 import { UpdateSizeOnDevice } from './update-size-on-device';
+import { Device } from '@capacitor/device';
 
 jest.mock('./update-size-on-device');
 
 declare const sbutility;
 
+jest.mock('@capacitor/device', () => {
+    return {
+      ...jest.requireActual('@capacitor/device'),
+        Device: {
+            getInfo: jest.fn()
+        }
+    }
+})
 describe('ExtractPayloads', () => {
     let extractPayloads: ExtractPayloads;
     const mockFileService: Partial<FileService> = {};
@@ -57,7 +66,7 @@ describe('ExtractPayloads', () => {
         error: jest.fn()
     } as any 
     beforeEach(() => {
-        window['device'] = { uuid: 'some_uuid', platform:'android' };
+        Device.getInfo = jest.fn(() => Promise.resolve({ uuid: 'some_uuid', platform:'android' })) as any;
         jest.clearAllMocks();
         (UpdateSizeOnDevice as jest.Mock<UpdateSizeOnDevice>).mockClear();
     });

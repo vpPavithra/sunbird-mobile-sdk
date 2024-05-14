@@ -21,8 +21,12 @@ describe('GetContentDetailsHandler', () => {
     const mockProfileService: Partial<ProfileService> = {};
     const mockApiService: Partial<ApiService> = {};
     const mockContentServiceConfig: Partial<ContentServiceConfig> = {};
-    const mockDbService: Partial<DbService> = {};
-    const mockEventsBusService: Partial<EventsBusService> = {};
+    const mockDbService: Partial<DbService> = {
+        update: jest.fn(() => of()),
+    };
+    const mockEventsBusService: Partial<EventsBusService> = {
+        emit: jest.fn()
+    };
 
     beforeAll(() => {
         getContentDetailsHandler = new GetContentDetailsHandler(
@@ -90,7 +94,7 @@ describe('GetContentDetailsHandler', () => {
     });
 
 
-    it('should handle undefined content', async (done) => {
+    it('should handle undefined content', (done) => {
         // arrange
         const request: ContentDetailRequest = {
             contentId: 'SAMPLE_CONTENT_ID'

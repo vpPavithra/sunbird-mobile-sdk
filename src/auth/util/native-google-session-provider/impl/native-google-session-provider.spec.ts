@@ -4,9 +4,19 @@ import { ApiService } from '../../../../api/def/api-service';
 import { SunbirdSdk } from '../../../../sdk';
 import { NativeGoogleSessionProvider } from './native-google-session-provider';
 import { JwtUtil } from '../../../../util/jwt-util';
+import { Device } from '@capacitor/device';
 
 const mockSunbirdSdk: Partial<SunbirdSdk> = {};
 SunbirdSdk['_instance'] = mockSunbirdSdk as SunbirdSdk;
+jest.mock('@capacitor/device', () => {
+    return {
+      ...jest.requireActual('@capacitor/device'),
+        Device: {
+            getInfo: jest.fn()
+        }
+    }
+})
+
 describe('NativeGoogleSessionProvider', () => {
     let nativeGoogleSessionProvider: NativeGoogleSessionProvider;
     let mockNativeGoogleTokenProvider: Partial<Promise<NativeGoogleSessionProvider>> = {};
@@ -20,7 +30,7 @@ describe('NativeGoogleSessionProvider', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        window['device'] = { uuid: 'some_uuid', platform: 'ios' };
+        Device.getInfo = jest.fn(() => Promise.resolve({ uuid: 'some_uuid', platform: 'ios' })) as any;
     });
 
     it('should create a instane of nativeGoogleSessionProvider', () => {

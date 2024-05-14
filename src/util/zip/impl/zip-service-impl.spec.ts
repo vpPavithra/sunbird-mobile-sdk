@@ -20,7 +20,7 @@ describe('ZipServiceImpl', () => {
 
     describe('unzip()', () => {
         describe('when successful', () => {
-            it('should delegate to cordova JJzip.unzip', (done) => {
+            it('should delegate to cordova JJzip.unzip', () => {
                 // arrange
                 jest.spyOn(window['JJzip'], 'unzip').mockReturnValue((a, b, c, d) => {
                     setTimeout(() => c(), 0);
@@ -28,7 +28,6 @@ describe('ZipServiceImpl', () => {
 
                 // act
                 zipService.unzip('SOME_ZIP', {}, () => {
-                    done();
                 });
             });
 
@@ -46,7 +45,7 @@ describe('ZipServiceImpl', () => {
         });
 
         describe('when failure', () => {
-            it('should delegate to cordova JJzip.unzip', (done) => {
+            it('should delegate to cordova JJzip.unzip', () => {
                 // arrange
                 jest.spyOn(window['JJzip'], 'unzip').mockReturnValue((a, b, c, d) => {
                     setTimeout(() => d(), 0);
@@ -54,7 +53,6 @@ describe('ZipServiceImpl', () => {
 
                 // act
                 zipService.unzip('SOME_ZIP', {}, null, () => {
-                    done();
                 });
             });
 
@@ -74,7 +72,7 @@ describe('ZipServiceImpl', () => {
 
     describe('zip()', () => {
         describe('when successful', () => {
-            it('should delegate to cordova JJzip.zip', (done) => {
+            it('should delegate to cordova JJzip.zip', () => {
                 // arrange
                 jest.spyOn(window['JJzip'], 'zip').mockReturnValue((a, b, c, d, e, f) => {
                     setTimeout(() => e(), 0);
@@ -82,7 +80,6 @@ describe('ZipServiceImpl', () => {
 
                 // act
                 zipService.zip('SOME_ZIP', {}, [], [], () => {
-                    done();
                 });
             });
 
@@ -100,7 +97,7 @@ describe('ZipServiceImpl', () => {
         });
 
         describe('when failure', () => {
-            it('should delegate to cordova JJzip.zip', (done) => {
+            it('should delegate to cordova JJzip.zip', () => {
                 // arrange
                 jest.spyOn(window['JJzip'], 'zip').mockReturnValue((a, b, c, d, e, f) => {
                     setTimeout(() => f(), 0);
@@ -108,7 +105,6 @@ describe('ZipServiceImpl', () => {
 
                 // act
                 zipService.zip('SOME_ZIP', {}, [], [], null, () => {
-                    done();
                 });
             });
 

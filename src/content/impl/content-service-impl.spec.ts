@@ -441,7 +441,7 @@ describe('ContentServiceImpl', () => {
 
 
     describe('deleteContent', () => {
-        it('should delete downloaded content from local', async (done) => {
+        it('should delete downloaded content from local', async () => {
             // arrange
             const contentDelete: ContentDelete[] = [{
                 contentId: 'SAMPLE_CONTENT_ID',
@@ -495,12 +495,11 @@ describe('ContentServiceImpl', () => {
                 // assert
                 expect(fetchData).toHaveBeenCalled();
                 expect(childrenData).toHaveBeenCalled();
-                done();
             });
         });
 
 
-        it('should be deleteAllChildren for local data', async (done) => {
+        it('should be deleteAllChildren for local data', async () => {
             // arrange
             const contentDelete: ContentDelete[] = [{
                 contentId: 'SAMPLE_CONTENT_ID',
@@ -549,11 +548,10 @@ describe('ContentServiceImpl', () => {
                 // assert
                 expect(fetchData).toHaveBeenCalled();
                 expect(ContentUtil.hasChildren).toHaveBeenCalled();
-                done();
             });
         });
 
-        it('should delete content but content is not available', async (done) => {
+        it('should delete content but content is not available', async () => {
             // arrange
             const contentDelete: ContentDelete[] = [{
                 contentId: 'SAMPLE_CONTENT_ID',
@@ -581,7 +579,6 @@ describe('ContentServiceImpl', () => {
             contentService.deleteContent(request).subscribe((val) => {
                 // assert
                 expect(val[0].identifier).toBe('SAMPLE_CONTENT_ID');
-                done();
             });
         });
     });

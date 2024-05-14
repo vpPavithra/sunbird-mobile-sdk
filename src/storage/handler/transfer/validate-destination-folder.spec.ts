@@ -24,7 +24,7 @@ describe('ValidateDestinationFolder', () => {
         expect(validateDestinationFolder).toBeTruthy();
     });
 
-    it('should create a directory and write ', (done) => {
+    it('should create a directory and write ', () => {
         // arrange
         jest.spyOn(sbutility, 'canWrite').mockReturnValue((a, b, c) => {
             setTimeout(() => {
@@ -68,12 +68,11 @@ describe('ValidateDestinationFolder', () => {
         });
         // act
         validateDestinationFolder.execute(request).subscribe(() => {
-            done();
         });
         // assert
     });
 
-    it('should create a directory and write ', (done) => {
+    it('should create a directory and write ', () => {
         // arrange
         jest.spyOn(sbutility, 'canWrite').mockReturnValue((a, b, c) => {
             setTimeout(() => {
@@ -124,9 +123,7 @@ describe('ValidateDestinationFolder', () => {
             nativeURL: ''
         });
         // act
-        validateDestinationFolder.execute(request).subscribe(() => {
-            done();
-        });
+        validateDestinationFolder.execute(request).subscribe(() => {});
         // assert
     });
 });

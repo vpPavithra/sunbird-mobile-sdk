@@ -23,7 +23,7 @@ describe('DeleteSourceFolder', () => {
         expect(deleteSourceFolder).toBeTruthy();
     });
 
-    it('should update storage management for does not exist existing content', (done) => {
+    it('should update storage management for does not exist existing content', () => {
         // arrange
         jest.spyOn(sbutility, 'copyDirectory').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
@@ -64,7 +64,6 @@ describe('DeleteSourceFolder', () => {
         };
         // act
         deleteSourceFolder.execute(request).subscribe(() => {
-            done();
         });
     });
 
@@ -157,7 +156,7 @@ describe('DeleteSourceFolder', () => {
         });
     });
 
-    it('should delete source folder for switch case higher version', (done) => {
+    it('should delete source folder for switch case higher version', () => {
         // arrange
         jest.spyOn(sbutility, 'copyDirectory').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
@@ -198,10 +197,9 @@ describe('DeleteSourceFolder', () => {
         };
         // act
         deleteSourceFolder.execute(request).subscribe(() => {
-            done();
         });
     });
-    it('should delete source folder for switch case lower version', (done) => {
+    it('should delete source folder for switch case lower version', () => {
         // arrange
         jest.spyOn(sbutility, 'copyDirectory').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
@@ -242,11 +240,10 @@ describe('DeleteSourceFolder', () => {
         };
         // act
         deleteSourceFolder.execute(request).subscribe(() => {
-            done();
         });
     });
 
-    it('should delete source folder for switch case lower version', (done) => {
+    it('should delete source folder for switch case lower version', () => {
         // arrange
         jest.spyOn(sbutility, 'copyDirectory').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
@@ -287,7 +284,6 @@ describe('DeleteSourceFolder', () => {
         };
         // act
         deleteSourceFolder.execute(request).subscribe(() => {
-            done();
         });
     });
 });

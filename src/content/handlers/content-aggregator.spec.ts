@@ -102,7 +102,7 @@ describe('ContentAggregator', () => {
                     mockContentService.getContents = jest.fn().mockImplementation(() => of(mockGetOfflineContentsResponse));
                     mockContentService.searchContent = jest.fn().mockImplementation(() => of(mockGetOnlineContentsResponse));
 
-                    jest.spyOn(CsContentsGroupGenerator, 'generate').mockImplementation();
+                    CsContentsGroupGenerator.generate = jest.fn(() => ({name: 'name', sections: [{contents: [{content: {primaryCategory: "Course"}}], count: 1, name: 'other'}]})) as any;
 
                     // act
                     contentAggregator.aggregate({}, ['TRACKABLE_COLLECTIONS'], {
@@ -205,7 +205,7 @@ describe('ContentAggregator', () => {
                     mockContentService.getContents = jest.fn().mockImplementation(() => of(mockGetOfflineContentsResponseWithTwoSubjects));
                     mockContentService.searchContent = jest.fn().mockImplementation(() => of(mockGetOnlineContentsResponse));
 
-                    jest.spyOn(CsContentsGroupGenerator, 'generate').mockImplementation();
+                    CsContentsGroupGenerator.generate = jest.fn(() => ({name: 'name', sections: [{contents: [{content: {primaryCategory: "Course"}}], count: 1, name: 'other'}]})) as any;
 
                     // act
                     contentAggregator.aggregate({
@@ -332,7 +332,7 @@ describe('ContentAggregator', () => {
                     mockContentService.getContents = jest.fn().mockImplementation(() => of(mockGetOfflineContentsResponseWithTwoSubjects));
                     mockContentService.searchContent = jest.fn().mockImplementation(() => of(mockGetOnlineContentsResponse));
 
-                    jest.spyOn(CsContentsGroupGenerator, 'generate').mockImplementation();
+                    CsContentsGroupGenerator.generate = jest.fn(() => ({name: 'name', sections: [{contents: [{content: {primaryCategory: "Course"}}], count: 1, name: 'other'}]})) as any;
 
                     // act
                     contentAggregator.aggregate({
@@ -508,12 +508,12 @@ describe('ContentAggregator', () => {
                                 'index': 0,
                                 'isEnabled': true,
                                 'data': {
-                                    'name': undefined,
+                                    'name': 'name',
                                     'sections': [
                                         {
                                             'contents': [{'content': {'primaryCategory': 'Course'}}],
                                             'count': 1,
-                                            'name': 'Other'
+                                            'name': 'other'
                                         }
                                     ]
                                 },
@@ -521,6 +521,7 @@ describe('ContentAggregator', () => {
                                 'dataSrc': expect.any(Object),
                                 'theme': expect.any(Object),
                                 'description': expect.any(String),
+                                "landingDetails": undefined
                             }]
                         });
                         done();

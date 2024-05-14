@@ -3,6 +3,7 @@ import { of } from 'rxjs';
 import { ApiService, SunbirdSdk } from '../../../..';
 import { NativeAppleSessionProvider } from './native-apple-session-provider';
 import { JwtUtil } from '../../../../util/jwt-util';
+import { Device } from '@capacitor/device';
 
 export interface NativeAppleTokens {
     email: string;
@@ -23,6 +24,15 @@ export interface NativeAppleTokens {
 
 const mockSunbirdSdk: Partial<SunbirdSdk> = {};
 SunbirdSdk['_instance'] = mockSunbirdSdk as SunbirdSdk;
+jest.mock('@capacitor/device', () => {
+    return {
+      ...jest.requireActual('@capacitor/device'),
+        Device: {
+            getInfo: jest.fn()
+        }
+    }
+})
+
 describe('NativeAppleSessionProvider', () => {
     let nativeAppleSessionProvider: NativeAppleSessionProvider;
     let mocknativeAppleTokenProvider: Partial<Promise<NativeAppleTokens>> = {};
@@ -37,7 +47,7 @@ describe('NativeAppleSessionProvider', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        window['device'] = { uuid: 'some_uuid', platform: 'ios' };
+        Device.getInfo = jest.fn(() => Promise.resolve({ uuid: 'some_uuid', platform: 'ios' })) as any;
     });
 
     it('should create a instanc of NativeAppleSessionProvider', () => {

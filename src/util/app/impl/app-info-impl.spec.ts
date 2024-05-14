@@ -4,6 +4,7 @@ import {SharedPreferences} from '../../..';
 import {of} from 'rxjs';
 import {AppInfoKeys} from '../../../preference-keys';
 import {CsModule} from '@project-sunbird/client-services';
+import { App } from '@capacitor/app';
 
 declare const sbutility;
 
@@ -38,9 +39,14 @@ describe('AppInfoImpl', () => {
             buildConfigPackage: 'build_config_package'
         }
     };
-
+    window['Capacitor'] = {
+        Plugins: {
+            App: {
+                getInfo: jest.fn(() => Promise.resolve({name: 'SOME_APP_NAME'})) as any
+            }
+        }
+    }
     beforeAll(() => {
-        window['cordova'] = {getAppVersion: {getAppName: (cb) => cb('SOME_APP_NAME')}} as any;
         appInfoImpl = new AppInfoImpl(
             mockSdkConfig as SdkConfig,
             mockSharedPreferences as SharedPreferences
@@ -49,9 +55,6 @@ describe('AppInfoImpl', () => {
 
     beforeEach(() => {
         jest.spyOn(CsModule.instance, 'isInitialised', 'get').mockReturnValue(false);
-    });
-
-    beforeEach(() => {
         jest.clearAllMocks();
     });
 
@@ -61,6 +64,7 @@ describe('AppInfoImpl', () => {
 
     it('should return app version name', () => {
         // arrange
+        App.getInfo = jest.fn(() => Promise.resolve({name: 'SOME_APP_NAME'})) as any;
         // act
         appInfoImpl.getVersionName();
         // arrange
@@ -138,7 +142,7 @@ describe('AppInfoImpl', () => {
                             channelId: 'channelId',
                             producerId: 'producerId',
                             deviceId: 'deviceId',
-                            appVersion: 'SOME_APP_NAME'
+                            appVersion: '6.0-local'
                         },
                         api: {
                             host: 'host',
@@ -152,18 +156,17 @@ describe('AppInfoImpl', () => {
         });
     });
 
-    it('should get setFirstAccessTimestamp for debugmode is true', async (done) => {
+    it('should get setFirstAccessTimestamp for debugmode is true', async () => {
         // arrange
         mockSharedPreferences.getString = jest.fn().mockImplementation(() => of('first_access_timestamp'));
         // act
         await appInfoImpl.init().then(() => {
             // assert
             expect(mockSharedPreferences.getString).toHaveBeenCalledWith(AppInfoKeys.KEY_FIRST_ACCESS_TIMESTAMP);
-            done();
         });
     });
 
-    it('should get setFirstAccessTimestamp if debugMode is false', async(done) => {
+    it('should get setFirstAccessTimestamp if debugMode is false', async() => {
         // arrange
         mockSharedPreferences.getString = jest.fn().mockImplementation(() => of(undefined));
         mockSharedPreferences.putString = jest.fn().mockImplementation(() => of(undefined));
@@ -210,7 +213,6 @@ describe('AppInfoImpl', () => {
             // assert
             expect(mockSharedPreferences.getString).toHaveBeenCalledWith(AppInfoKeys.KEY_FIRST_ACCESS_TIMESTAMP);
             expect(mockSharedPreferences.putString).toHaveBeenCalledWith(AppInfoKeys.KEY_FIRST_ACCESS_TIMESTAMP, expect.any(String));
-            done();
         });
     });
 

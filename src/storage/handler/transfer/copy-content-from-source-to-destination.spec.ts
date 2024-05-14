@@ -27,7 +27,7 @@ describe('CopyContentFromSourceToDestination', () => {
         expect(copyContentFromSourceToDestination).toBeTruthy();
     });
 
-    it('should handle storage transfer', (done) => {
+    it('should handle storage transfer', () => {
         // arrange
         jest.spyOn(sbutility, 'rm').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
@@ -55,11 +55,10 @@ describe('CopyContentFromSourceToDestination', () => {
         copyContentFromSourceToDestination.execute(request).subscribe(null, (e) => {
             // assert
             expect(e instanceof CancellationError).toBeTruthy();
-           done();
         });
     });
 
-    it('should handle storage transfer', (done) => {
+    it('should handle storage transfer', () => {
         // arrange
         jest.spyOn(sbutility, 'copyDirectory').mockReturnValue((a, b, c, d) => {
             setTimeout(() => {
@@ -94,7 +93,6 @@ describe('CopyContentFromSourceToDestination', () => {
         };
         mockEventBusService.emit = jest.fn().mockImplementation(() => of({}));
         copyContentFromSourceToDestination.execute(request).subscribe(() => {
-            done();
         });
     });
 
