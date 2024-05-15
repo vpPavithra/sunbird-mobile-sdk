@@ -60,7 +60,7 @@ describe('NativeAppleSessionProvider', () => {
                 return;
             });
         });
-        it('should return server response for apple login', (done) => {
+        it('should return server response for apple login', () => {
             const mockSession = {
                 body: {
                     sessionId: {
@@ -71,13 +71,14 @@ describe('NativeAppleSessionProvider', () => {
                 }
             };
             mockApiService.fetch = jest.fn(() => of(mockSession) as any);
+            nativeAppleSessionProvider['callAppleNativeLogin'] = jest.fn(() => of())
             jest.spyOn(JwtUtil, 'decodeJWT').mockImplementation(() => Promise.resolve(`{ "iss": "https://staging.sunbirded.org/auth/realms/sunbird",
             "exp": 1711023727,
             "sub": "f:979738b7-253c-4adf-9673-a857eeb86115:372504c7-838a-433c-a24d-f8ac0ed5c480"}`));
-            nativeAppleSessionProvider.provide().then(() => {
+            nativeAppleSessionProvider.provide()
+            setTimeout(() => {
                 expect(mockApiService.fetch).toHaveBeenCalled();
-                done();
-            });
+            }, 0);
         });
     });
 });

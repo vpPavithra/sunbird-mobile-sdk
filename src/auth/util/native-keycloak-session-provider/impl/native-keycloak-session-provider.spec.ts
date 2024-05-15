@@ -25,7 +25,7 @@ jest.mock('@project-sunbird/client-services', () => {
     };
 });
 
-const mockManualLoginConfig: WebviewSessionProviderConfig = {
+let mockManualLoginConfig: WebviewSessionProviderConfig = {
     'context': 'login',
     'target': {
         'host': 'https://login.staging.ntp.net.in',
@@ -119,17 +119,20 @@ jest.mock('@capacitor/device', () => {
     }
 })
 describe('NativeKeycloakSessionProvider', () => {
-    const mockApiService: Partial<ApiService> = {};
-    const nativeKeyclaokToken: Partial<NativeKeycloakTokens> = {};
     let nativeKeycloakSessionProvider: NativeKeycloakSessionProvider;
-
+    let mockNativeKeycloakTokenProvider: Partial<Promise<NativeKeycloakSessionProvider>> = {};
+    const mockApiService: Partial<ApiService> = {};
     beforeAll(() => {
         (mockSunbirdSdk as any)['apiService'] = mockApiService as ApiService;
         (mockSunbirdSdk as any)['sdkConfig'] = {apiConfig: {}};
-
         nativeKeycloakSessionProvider = new NativeKeycloakSessionProvider(
-            mockManualLoginConfig,
-            nativeKeyclaokToken as NativeKeycloakTokens
+            mockNativeKeycloakTokenProvider = jest.fn(() => Promise.resolve({
+                WebviewSessionProviderConfig: mockManualLoginConfig,
+                NativeKeycloakTokens: {
+                    username: 'mockedUsername',
+                    password: 'mockedPassword'
+                }
+            })) as any
         );
     });
 
@@ -144,6 +147,15 @@ describe('NativeKeycloakSessionProvider', () => {
 
     describe('provide()', () => {
         it('should pass all login details on api call with sucess access token', () => {
+            nativeKeycloakSessionProvider = new NativeKeycloakSessionProvider(
+                mockNativeKeycloakTokenProvider = jest.fn(() => Promise.resolve({
+                    WebviewSessionProviderConfig: mockManualLoginConfig,
+                    NativeKeycloakTokens: {
+                        username: 'mockedUsername',
+                        password: 'mockedPassword'
+                    }
+                })) as any
+            );
             Device.getInfo = jest.fn(() => Promise.resolve({
                 uuid:'some_id',
                 platform: 'android'
@@ -170,6 +182,12 @@ describe('NativeKeycloakSessionProvider', () => {
             });
         });
         it('should pass all login details on api call with success and validate err', () => {
+            nativeKeycloakSessionProvider = new NativeKeycloakSessionProvider(
+                mockNativeKeycloakTokenProvider = jest.fn(() => Promise.resolve({
+                    WebviewSessionProviderConfig: mockManualLoginConfig,
+                    NativeKeycloakTokens: {}
+                })) as any
+            );
             Device.getInfo = jest.fn(() => Promise.resolve({
                 uuid:'some_id',
                 platform: 'android'

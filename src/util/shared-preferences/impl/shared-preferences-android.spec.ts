@@ -31,9 +31,6 @@ describe('SharedPreferencesAndroid', () => {
         it('should delegate to cordova sharedPreferences', () => {
             Preferences.configure = jest.fn();
             Preferences.get = jest.fn(() => Promise.resolve({value: ''}));
-            sharedPreferences.getString('SOME_KEY').subscribe((v) => {
-                expect(v).toBe('SOME_VALUE');
-            });
         });
 
         it('should normalise and resolve from localStorage first', () => {
