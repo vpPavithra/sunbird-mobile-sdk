@@ -1,7 +1,7 @@
 import {AppInfoImpl} from './app-info-impl';
 import {SdkConfig} from '../../../sdk-config';
 import {SharedPreferences} from '../../..';
-import {of} from 'rxjs';
+import {of, throwError} from 'rxjs';
 import {AppInfoKeys} from '../../../preference-keys';
 import {CsModule} from '@project-sunbird/client-services';
 import { App } from '@capacitor/app';
@@ -67,6 +67,14 @@ describe('AppInfoImpl', () => {
         App.getInfo = jest.fn(() => Promise.resolve({name: 'SOME_APP_NAME'})) as any;
         // act
         appInfoImpl.getVersionName();
+        // arrange
+    });
+
+    it('should return app version name', () => {
+        // arrange
+        App.getInfo = jest.fn(() => Promise.resolve({name: 'SOME_APP_NAME'})) as any;
+        // act
+        appInfoImpl.getAppName();
         // arrange
     });
 
@@ -224,6 +232,37 @@ describe('AppInfoImpl', () => {
             // assert
             expect(mockSharedPreferences.getString).toHaveBeenCalledWith(AppInfoKeys.KEY_FIRST_ACCESS_TIMESTAMP);
             done();
+        });
+    });
+
+    describe('getBuildConfigValue', () => {
+        it('should resolve with the correct value', async () => {
+            const mockGetBuildConfigValue = jest.fn((packageName, property, successCallback, errorCallback) => {
+                successCallback('mockedValue');
+            });
+            sbutility.getBuildConfigValue = mockGetBuildConfigValue;
+            // act
+            const result = await appInfoImpl.getBuildConfigValue('packageName', 'property');
+            // Expectations
+            expect(mockGetBuildConfigValue).toHaveBeenCalledWith('packageName', 'property', expect.any(Function), expect.any(Function));
+            expect(result).toBe('mockedValue');
+        });
+    
+        it('should reject with an error', async () => {
+            const mockGetBuildConfigValue = jest.fn((packageName, property, successCallback, errorCallback) => {
+                // Simulate error callback
+                errorCallback('mockedError');
+            });
+            sbutility.getBuildConfigValue = mockGetBuildConfigValue;
+    
+            // act
+            try {
+                await appInfoImpl.getBuildConfigValue('packageName', 'property');
+                fail('Expected promise to reject, but it resolved');
+            } catch (error) {
+                expect(mockGetBuildConfigValue).toHaveBeenCalledWith('packageName', 'property', expect.any(Function), expect.any(Function));
+                expect(error).toBe('mockedError');
+            }
         });
     });
 });

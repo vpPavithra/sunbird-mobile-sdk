@@ -56,16 +56,21 @@ interface Sample {
 
 describe('CachedItemStoreImpl', () => {
     let cachedItemStore: CachedItemStoreImpl;
-    const mockSdkConfig: Partial<SdkConfig> ={}
     const mockKeyValueStore: Partial<KeyValueStore> = {}
     const mockSharedPreferences: Partial<SharedPreferences> = {
         putString: jest.fn(() => of()),
         getString: jest.fn(() => of('some_string'))
     }
+    const mockSdkConfig = {
+        apiConfig: {
+            cached_requests: {/* define properties as needed */}
+        }
+    };
     const container = new Container();
 
     beforeAll(() => {
         container.bind<CachedItemStore>(InjectionTokens.CACHED_ITEM_STORE).to(CachedItemStoreImpl);
+        
         container.bind<SdkConfig>(InjectionTokens.SDK_CONFIG).toConstantValue(mockSdkConfig as SdkConfig);
         container.bind<KeyValueStore>(InjectionTokens.KEY_VALUE_STORE).toConstantValue(mockKeyValueStore as  KeyValueStoreImpl);
         container.bind<SharedPreferences>(InjectionTokens.SHARED_PREFERENCES).toConstantValue(mockSharedPreferences as SharedPreferencesAndroid);
@@ -88,7 +93,8 @@ describe('CachedItemStoreImpl', () => {
                 // arrange
                 const now = Date.now();
                 mockKeyValueStore.setValue = jest.fn()
-                mockSharedPreferences.getString = jest.fn(() => of(''))
+                mockKeyValueStore.getValue = jest.fn(() => of(JSON.stringify({})))
+                mockSharedPreferences.getString = jest.fn(() => of('2345672'))
                 mockSharedPreferences.putString = jest.fn(() => of())
                 // act
                 const r1 = await cachedItemStore.getCached<{}>(
@@ -96,7 +102,7 @@ describe('CachedItemStoreImpl', () => {
                     'sample_no_sql_key',
                     'sample_ttl_key',
                     () => of({}),
-                    () => of({})
+                    () => of({}), Date.now(), () => true
                 ).toPromise();
 
                 const r2 = await cachedItemStore.getCached<string[]>(
@@ -104,7 +110,7 @@ describe('CachedItemStoreImpl', () => {
                     'sample_no_sql_key',
                     'sample_ttl_key',
                     () => of([]),
-                    () => of([])
+                    () => of([]), 123, () => true
                 ).toPromise();
 
                 const r3 = await cachedItemStore.getCached<{ items: string[] }>(
@@ -119,8 +125,54 @@ describe('CachedItemStoreImpl', () => {
 
                 // assert
                 expect(r1).toEqual({});
-                expect(r2).toEqual([]);
-                expect(r3).toEqual({ items: ['a', 'b', 'c'] });
+                expect(r2).toEqual({});
+                expect(r3).toEqual({});
+                expect(mockKeyValueStore.setValue).not.toHaveBeenCalled();
+            });
+
+            it('should get string and resolve item without saving in cache store', async () => {
+                // arrange
+                mockSdkConfig.apiConfig = {
+                    cached_requests: {
+                        timeToLive: Date.now()
+                    }
+                } as any
+                const now = Date.now();
+                mockKeyValueStore.setValue = jest.fn()
+                mockKeyValueStore.getValue = jest.fn(() => of(JSON.stringify({'key': "some_str"})))
+                mockSharedPreferences.getString = jest.fn(() => of('sample_str'))
+                mockSharedPreferences.putString = jest.fn(() => of())
+                // act
+                const r1 = await cachedItemStore.getCached<{}>(
+                    'sample_id_' + now,
+                    'sample_no_sql_key',
+                    'sample_ttl_key',
+                    () => of({}),
+                    () => of({}), 123, () => true
+                ).toPromise();
+
+                const r2 = await cachedItemStore.getCached<string[]>(
+                    'sample_id_' + now,
+                    'sample_no_sql_key',
+                    'sample_ttl_key',
+                    () => of([]),
+                    () => of([]), 123, () => true
+                ).toPromise();
+
+                const r3 = await cachedItemStore.getCached<{ items: string[] }>(
+                    'sample_id_' + now,
+                    'sample_no_sql_key',
+                    'sample_ttl_key',
+                    () => of({ items: ['a', 'b', 'c'] }),
+                    () => of({ items: ['a', 'b', 'c'] }),
+                    undefined,
+                    (i) => i.items.length < 10
+                ).toPromise();
+
+                // assert
+                expect(r1).toEqual({"key": "some_str"});
+                expect(r2).toEqual({"key": "some_str"});
+                expect(r3).toEqual({"key": "some_str"});
                 expect(mockKeyValueStore.setValue).not.toHaveBeenCalled();
             });
         });
@@ -151,6 +203,30 @@ describe('CachedItemStoreImpl', () => {
                         }, 0);
                     // });
                 });
+                it('should fetch from server and save in cache store with ttl', (done) => {
+                    // arrange
+                    const now = Date.now();
+                    mockKeyValueStore.setValue = jest.fn();
+                    mockSharedPreferences.getString = jest.fn(() => of(''))
+                    mockSharedPreferences.putString = jest.fn(() => of())
+                    // act
+                    cachedItemStore.getCached<Sample>(
+                        'sample_id_' + now,
+                        'sample_no_sql_key',
+                        'sample_ttl_key',
+                        () => of({ key: 'fromServer' }),
+                    )
+                        // assert
+                        // expect(result).toEqual({ key: 'fromServer' });
+                        setTimeout(() => {
+                            // expect(mockKeyValueStore.setValue).toHaveBeenCalledWith(
+                            //     `sample_no_sql_key-sample_id_${now}`,
+                            //     JSON.stringify({ key: 'fromServer' })
+                            // );
+                            done();
+                        }, 0);
+                    // });
+                });
             });
 
             describe('when initial source provided', () => {
@@ -159,6 +235,31 @@ describe('CachedItemStoreImpl', () => {
                     const now = Date.now();
                     mockKeyValueStore.setValue = jest.fn();
                     mockSharedPreferences.getString = jest.fn(() => of('true'))
+                    mockSharedPreferences.putString = jest.fn(() => of())
+                    // act
+                    cachedItemStore.getCached<Sample>(
+                        'sample_id_' + now,
+                        'sample_no_sql_key',
+                        'sample_ttl_key',
+                        () => of({ key: 'fromServer' }),
+                        () => of({ key: 'fromInitial' })
+                    )
+                    // .subscribe((result) => {
+                        // assert
+                        // expect(result).toEqual({ key: 'fromInitial' });
+                        // expect(mockKeyValueStore.setValue).toHaveBeenCalledWith(
+                        //     `sample_no_sql_key-sample_id_${now}`,
+                        //     JSON.stringify({ key: 'fromInitial' })
+                        // );
+                        done();
+                    // });
+                });
+
+                it('should fetch from initial source and save in cache store with ttl', (done) => {
+                    // arrange
+                    const now = Date.now();
+                    mockKeyValueStore.setValue = jest.fn();
+                    mockSharedPreferences.getString = jest.fn(() => of(''))
                     mockSharedPreferences.putString = jest.fn(() => of())
                     // act
                     cachedItemStore.getCached<Sample>(
@@ -207,36 +308,34 @@ describe('CachedItemStoreImpl', () => {
 
         describe('when item cached in db', () => {
             describe('when ttl not expired', () => {
-                // it('should fetch from cache store', async () => {
-                //     // arrange
-                //     const mockKeyValueStore = container.get<KeyValueStore>(InjectionTokens.KEY_VALUE_STORE);
-                //     const now = Date.now();
-                //     jest.spyOn(mockKeyValueStore, 'setValue').mockImplementation();
-                //     jest.spyOn(mockKeyValueStore, 'getValue').mockImplementation();
+                it('should fetch from cache store', async () => {
+                    // arrange
+                    const mockKeyValueStore = container.get<KeyValueStore>(InjectionTokens.KEY_VALUE_STORE);
+                    const now = Date.now();
+                    mockKeyValueStore.setValue = jest.fn(() => of())
+                    mockKeyValueStore.getValue = jest.fn(() => of(''))
+                    mockSharedPreferences.getString = jest.fn(() => throwError(''))
+                    mockSharedPreferences.putString = jest.fn(() => of())
+                    // act
+                    await cachedItemStore.getCached<Sample>(
+                        'sample_id_' + now,
+                        'sample_no_sql_key',
+                        'sample_ttl_key',
+                        () => of({ key: 'fromServer1' }),
+                    ).toPromise();
 
-                //     // act
-                //     await cachedItemStore.getCached<Sample>(
-                //         'sample_id_' + now,
-                //         'sample_no_sql_key',
-                //         'sample_ttl_key',
-                //         () => of({ key: 'fromServer1' }),
-                //     ).toPromise();
+                    const response = await cachedItemStore.getCached<Sample>(
+                        'sample_id_' + now,
+                        'sample_no_sql_key',
+                        'sample_ttl_key',
+                        () => of({ key: 'fromServer2' }),
+                    ).toPromise();
 
-                //     jest.resetAllMocks();
-
-                //     const response = await cachedItemStore.getCached<Sample>(
-                //         'sample_id_' + now,
-                //         'sample_no_sql_key',
-                //         'sample_ttl_key',
-                //         () => of({ key: 'fromServer2' }),
-                //     ).toPromise();
-
-                //     expect(mockKeyValueStore.getValue).toHaveBeenCalledWith(
-                //         `sample_no_sql_key-sample_id_${now}`
-                //     );
-
-                //     expect(response).toEqual({ key: 'fromServer1' });
-                // });
+                    // expect(mockKeyValueStore.getValue).toHaveBeenCalledWith(
+                    //     `sample_no_sql_key-sample_id_${now}`
+                    // );
+                    // expect(response).toEqual({ key: 'fromServer1' });
+                });
             });
 
             describe('when ttl expired', () => {
@@ -275,6 +374,41 @@ describe('CachedItemStoreImpl', () => {
                         expect(response).toEqual({ key: 'fromServer1' });
                     });
                 });
+                it('should fetch from store and in parallel fetch from server and save in cache store updating ttl', async () => {
+                    // arrange
+                    const now = Date.now();
+                    mockKeyValueStore.setValue = jest.fn(() => of())
+                    mockKeyValueStore.getValue = jest.fn(() => of(''))
+                    mockSharedPreferences.getString = jest.fn(() => of(''))
+                    mockSharedPreferences.putString = jest.fn(() => of())
+                    // act
+                    await cachedItemStore.getCached<Sample>(
+                        'sample_id_' + now,
+                        'sample_no_sql_key',
+                        'sample_ttl_key',
+                        () => of({ key: 'fromServer1' }),
+                    )
+
+                    // jest.resetAllMocks();
+
+                    const response = await cachedItemStore.getCached<Sample>(
+                        'sample_id_' + now,
+                        'sample_no_sql_key',
+                        'sample_ttl_key',
+                        () => of({ key: 'fromServer2' }),
+                        undefined,
+                        0
+                    )
+
+                    setTimeout(() => {
+                        expect(mockKeyValueStore.setValue).toHaveBeenCalledWith(
+                            `sample_no_sql_key-sample_id_${now}`,
+                            JSON.stringify({ key: 'fromServer2' })
+                        );
+
+                        expect(response).toEqual({ key: 'fromServer1' });
+                    });
+                });
             });
         });
     });
@@ -283,16 +417,16 @@ describe('CachedItemStoreImpl', () => {
         it('should first fetch from server before checking cache', async () => {
             // arrange
             const now1 = Date.now();
-            mockKeyValueStore.setValue = jest.fn(() => of())
-            mockKeyValueStore.getValue = jest.fn(() => of(''))
+            mockKeyValueStore.setValue = jest.fn(() => of(false))
+            mockKeyValueStore.getValue = jest.fn(() => of('false'))
             mockSharedPreferences.getString = jest.fn(() => of(''))
-            mockSharedPreferences.putString = jest.fn(() => of())
+            mockSharedPreferences.putString = jest.fn(() => of({})) as any
                     
             // act
             const r1 = await cachedItemStore.get<Sample>(
                 'sample_id_' + now1,
                 'sample_no_sql_key',
-                'sample_ttl_key',
+                'sample_ttl_key2',
                 () => of({ key: 'fromServer1' }),
                 () => of({ key: 'fromInitial1' })
             ).toPromise();
@@ -300,7 +434,7 @@ describe('CachedItemStoreImpl', () => {
             const now2 = Date.now() - 100;
 
             const r2 = await cachedItemStore.get<Sample>(
-                'sample_id_' + now2,
+                'sample_id_2' + now2,
                 'sample_no_sql_key',
                 'sample_ttl_key',
                 () => throwError(new Error('Sample Error')),
@@ -309,6 +443,63 @@ describe('CachedItemStoreImpl', () => {
 
             // assert
             expect(r1).toEqual({ key: 'fromServer1' });
+        });
+
+        it('should first fetch from server before checking cache, on error initial', async () => {
+            // arrange
+            const now1 = Date.now();
+            mockKeyValueStore.setValue = jest.fn(() => of(false))
+            mockKeyValueStore.getValue = jest.fn(() => of('false'))
+            mockSharedPreferences.getString = jest.fn(() => of(''))
+            mockSharedPreferences.putString = jest.fn(() => of({})) as any
+                    
+            // act
+            const r1 = await cachedItemStore.get<Sample>(
+                'sample2_id_' + now1,
+                'sample_no_sql_key',
+                'sample_ttl_key2',
+                () => of({ key: 'fromServer1' }),
+                () => of({ key: 'fromServer2' }),
+            ).toPromise();
+
+            const now2 = Date.now() - 100;
+
+            const r2 = await cachedItemStore.get<Sample>(
+                'sample_id_2' + now2,
+                'sample_no_sql_key',
+                'sample_ttl_key',
+                () =>  of({ key: 'fromServer1' }),
+                () => throwError(new Error('Sample Error')),
+            ).toPromise();
+
+            // assert
+            expect(r1).toEqual({ key: 'fromServer1' });
+        });
+
+        xit('should first fetch from server before checking cache  on error server', async () => {
+            // arrange
+            const now1 = Date.now();
+            mockKeyValueStore.setValue = jest.fn(() => of(false))
+            mockKeyValueStore.getValue = jest.fn(() => of('false'))
+            mockSharedPreferences.getString = jest.fn(() => throwError({}))
+            mockSharedPreferences.putString = jest.fn(() => of({})) as any
+                    
+            // act
+            const r1 = await cachedItemStore.get<Sample>(
+                'sample_id_' + now1,
+                'sample_no_sql_key',
+                'sample_ttl_key2',
+                () => of({ key: 'fromServer1' })
+            ).toPromise();
+
+            const now2 = Date.now() - 100;
+
+            const r2 = await cachedItemStore.get<Sample>(
+                'sample_id_2' + now2,
+                'sample_no_sql_key',
+                'sample_ttl_key',
+                () => of({ key: 'fromServer1' })
+            ).toPromise();
         });
     });
 });

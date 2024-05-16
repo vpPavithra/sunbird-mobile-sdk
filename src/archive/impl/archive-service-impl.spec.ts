@@ -104,7 +104,7 @@ describe('ArchiveServiceImpl', () => {
             ).toPromise().catch(() => {
                 // assert
                 expect(mockFileService.createDir).toHaveBeenCalledWith(
-                    expect.stringMatching(`${cordova.file.externalCacheDirectory}`),
+                    expect.stringMatching(`${window['cordova'].file.externalCacheDirectory}`),
                     false
                 );
 
